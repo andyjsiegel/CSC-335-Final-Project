@@ -24,6 +24,7 @@ public class UserDatabase {
     // provide a second  constructor that takes a file path as a parameter for testing
     public UserDatabase(String filePath) {
         this.filePath = filePath;
+        initializeDatabase();
     }
 
     public void addUser(User user) {
@@ -63,9 +64,9 @@ public class UserDatabase {
                     // Create a User object based on the role
                     User user;
                     if (role.equalsIgnoreCase("Student")) {
-                        user = new Student(username, hashedPassword, email, name);
+                        user = new Student(username, hashedPassword, name, true);
                     } else if (role.equalsIgnoreCase("Instructor")) {
-                        user = new Instructor(username, hashedPassword, email, name);
+                        user = new Instructor(username, hashedPassword, name, true);
                     } else {
                         System.err.println("Unknown role: " + role);
                         continue; // Skip unknown roles

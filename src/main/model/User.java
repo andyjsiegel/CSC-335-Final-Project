@@ -7,21 +7,15 @@ import java.util.Base64;
 public abstract class User {
     protected String username;
     protected String password;
-    protected String email;
-    protected String firstName;
-    protected String lastName;
+    protected String name;
 
-    public User(String username, String password, String email, String firstName, String lastName) {
+    public User(String username, String password, String name, boolean isHashed) {
         this.username = username;
-        this.password = hashPassword(password);
-        this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        if(isHashed) this.password = password;
+        else this.password = hashPassword(password);
+        this.name = name;
     }
 
-    public User(String username, String password, String email, String name) {
-        this(username, password, email, name.split(" ")[0], name.split(" ")[1]);
-    }
 
     public String getUsername() {
         return username;
