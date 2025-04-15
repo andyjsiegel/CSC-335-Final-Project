@@ -49,6 +49,70 @@ public class Course {
         this.daysOfWeek = new ArrayList<String>();
     }
 
+    /* 
+     * One Course, let's say the name of it is CSC 335
+     * Things/ Methods that need to be added for the Course.java class:
+     * 
+     * Add and remove students from the course. This is easily solvable with the StudentList class
+     * 			-> each course has a student list
+     * ADD and remove assignments from a course, already have an assignemnt class, just have to add a method to
+     * 			-> need to add remove (can easily do it with an arraylist of assignemnts and use iterable to remove)
+     * Import a list of students to add to the course: Well i guess same idea, it involvs modyfing the StudentList class
+     * View the students enrolled in a course: easy enough, just make a method in student list
+     * 
+     * Calculate class averages and medians: easy enough, a student has a student gradeBook, and that cotnains the 
+     * 				average of the student, the total points, etc all neeeded for median/average.
+     * sort students by grades on an assingment : easy enough again, we just have to add the students first and then do allat
+     * 
+     * 	View ungraded assignments.			(meaning an assingment must have a graded flag, (( if graded = true, cant modify grade? prob not))
+	 	Choose a mode for calculating class averages. ( no idea what this even means ngl)
+		Set up categories of assignments with weights, allowing for dropped assignments. (so basically modify the assignments class again
+						this is a bit more complex i guess but it should still work relatively the same way ??
+						-> so adding a catergory to an assignment, prob not worth to make a category class but worth looking into
+
+     * 
+     */
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     @Override
     public String toString() {
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("h:mm a"); // Pattern for 12-hour format with AM/PM

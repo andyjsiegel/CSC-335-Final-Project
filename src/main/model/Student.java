@@ -21,9 +21,18 @@ public class Student extends User {
 			public int compare(Student s1, Student s2) {
 				int nameCompare = s1.name.compareToIgnoreCase(s2.name);
 				return nameCompare;
-			}
-	};
-
-
+				}
+		};
 	}
+	
+	public static Comparator<Student> sortByUsername() {
+		return new Comparator<Student>() {
+			public int compare(Student s1, Student s2) {
+				int nameCompare = s1.username.compareToIgnoreCase(s2.name);
+				return nameCompare;
+				}
+		};
+	}
+	
+	
 }
