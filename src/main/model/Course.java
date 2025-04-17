@@ -18,10 +18,13 @@ public class Course {
     private int credits;
     private LocalTime startTime;
     private LocalTime endTime;
-    private ArrayList<String> daysOfWeek;
+    private ArrayList<Enum> daysOfWeek; //TODO: THis needs to be implemented fully
     private String courseCode;
 
-    public Course(String name, String description, int credits, ArrayList<String> daysOfWeek, LocalTime startTime, LocalTime endTime, HashMap<String, Double> categoryWeights, String courseCode) {
+    public Course(String name, String description, int credits,
+                  ArrayList<String> daysOfWeek, LocalTime startTime,
+                  LocalTime endTime, HashMap<String, 
+                  Double> categoryWeights, String courseCode) {
         this.name = name;
         this.description = description;
         this.courseCode = courseCode;
@@ -29,24 +32,10 @@ public class Course {
         this.students = new ArrayList<Student>();
         this.instructors = new ArrayList<Instructor>();
         this.categoryWeights = categoryWeights;
-        this.daysOfWeek = new ArrayList<String>();
+        //this.daysOfWeek = new ArrayList<String>();
         this.startTime = startTime;
         this.endTime = endTime;
-        this.daysOfWeek = daysOfWeek;
-    }
-    //TODO: delete this, it is for
-    public Course(String name, LocalTime startTime, LocalTime endTime) {
-        this.name = name;
-        this.description = "";
-        this.courseCode = "";
-        this.credits = 0;
-        this.students = new ArrayList<Student>();
-        this.instructors = new ArrayList<Instructor>();
-        this.categoryWeights = new HashMap<String, Double>();
-        this.daysOfWeek = new ArrayList<String>();
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.daysOfWeek = new ArrayList<String>();
+        //this.daysOfWeek = daysOfWeek;
     }
 
     @Override
@@ -57,7 +46,7 @@ public class Course {
         sb.append("Course Name: ").append(name).append("\n");
         sb.append("Description: ").append(description).append("\n");
         sb.append("Credits: ").append(credits).append("\n");
-        sb.append("Schedule: ").append(String.join(", ", daysOfWeek)).append("\n");
+        //sb.append("Schedule: ").append(String.join(", ", daysOfWeek)).append("\n");
         sb.append("Time: ").append(startTime.format(timeFormatter)).append(" - ").append(endTime.format(timeFormatter)).append("\n");
         sb.append("Category Weights:\n");
 
@@ -96,5 +85,9 @@ public class Course {
     }
     public long getDuration() {
         return Duration.between(startTime, endTime).toMinutes();
+    }
+
+    public ArrayList<Enum> getDays() {
+        return daysOfWeek;
     }
 }
