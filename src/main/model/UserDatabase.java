@@ -29,7 +29,7 @@ public class UserDatabase {
 
     public void addUser(User user) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
-            writer.write(user.getUsername() + "," + user.getHashedPassword() + "\n");
+            writer.write(user.getUsername() + "," + user.getHashedPassword() + "," + user.getEmail() + "," + user.getName() + "," + user.getClass().getSimpleName() + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -64,9 +64,9 @@ public class UserDatabase {
                     // Create a User object based on the role
                     User user;
                     if (role.equalsIgnoreCase("Student")) {
-                        user = new Student(username, hashedPassword, name, true);
+                        user = new Student(username, hashedPassword, email, name, true);
                     } else if (role.equalsIgnoreCase("Instructor")) {
-                        user = new Instructor(username, hashedPassword, name, true);
+                        user = new Instructor(username, hashedPassword, email, name, true);
                     } else {
                         System.err.println("Unknown role: " + role);
                         continue; // Skip unknown roles
