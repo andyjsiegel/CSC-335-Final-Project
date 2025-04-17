@@ -7,8 +7,9 @@ public class Student extends User {
 	
     private ArrayList<Course> coursesTaken;
     
-    public Student(String username, String password, String name, boolean isHashed) {
-        super(username, password, name, isHashed);
+    public Student(String username, String password, String email, String name, boolean isHashed) {
+        super(username, password, email, name, isHashed);
+		coursesTaken = new ArrayList<Course>();
     }
     
 
@@ -19,5 +20,9 @@ public class Student extends User {
 				return nameCompare;
 			}
 		};
+	}
+
+	public ArrayList<Course> getCoursesForDay(Days day) {
+		return coursesTaken;
 	}
 }
