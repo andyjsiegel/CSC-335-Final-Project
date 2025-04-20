@@ -44,13 +44,18 @@ public class LoginScreen extends JFrame {
         String password = new String(passwordField.getPassword());
 
         UserDatabase userDatabase = new UserDatabase();
-        // userDatabase.addUser(new Student("siegela1", "password", "siegela1@arizona.edu", "Andy Siegel"));
+        userDatabase.addUser(new Instructor("pelier", "password", "siegela1@arizona.edu", false));
         User user = userDatabase.getUser(username, password);
 
         if (user != null) {
             messageLabel.setForeground(Color.GREEN);
             messageLabel.setText("Login successful!");
-            // Proceed to the next screen or functionality
+            if (user instanceof Instructor) {
+                new InstructorView((Instructor) user);
+            } else if (user instanceof Student) {
+                //TODO: This should be similar to the instructor view but for students
+                //new StudentView(user);
+            }
         } else {
             messageLabel.setForeground(Color.RED);
             messageLabel.setText("Username or password is incorrect.");
