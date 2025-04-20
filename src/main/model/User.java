@@ -2,6 +2,7 @@ package main.model;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Base64;
 
 public abstract class User {
@@ -57,4 +58,6 @@ public abstract class User {
     public String getHashedPassword() {
         return password;
     }
+    
+    public abstract ArrayList<Course> getCoursesForDay(Days day);
 }
