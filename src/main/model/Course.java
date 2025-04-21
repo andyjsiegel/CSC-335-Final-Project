@@ -78,9 +78,6 @@ public class Course {
     	this.assignments.removeAssignment(assignment);
     }
     
-    
-
-	
     /* 
      * One Course, let's say the name of it is CSC 335
      * Things/ Methods that need to be added for the Course.java class:

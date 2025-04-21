@@ -1,18 +1,25 @@
 package main.view;
 
+import main.controller.LoginController;
 import main.model.*;
+import main.observer.LoginViewObserver;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.Calendar;
 
-public class LoginScreen extends JFrame {
+public class LoginScreen extends JFrame implements LoginViewObserver{
+  
+    private LoginController loginController;
+
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JLabel messageLabel;
 
     public LoginScreen() {
         // Set up the frame
+        loginController = new LoginController(this); 
+
         setTitle("Login");
         setSize(400, 250);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -60,19 +67,9 @@ public class LoginScreen extends JFrame {
         // Password field
         passwordField = new JPasswordField(15);
         passwordField.setFont(font);
-        passwordField.addActionListener(e -> handleLogin());
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.WEST;
         add(passwordField, gbc);
-
-        // Login button
-        ColoredButton loginButton = new ColoredButton("Login");
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.gridwidth = 2;
-        gbc.insets = new Insets(20, 10, 10, 10);
-        gbc.anchor = GridBagConstraints.CENTER;
-        add(loginButton, gbc);
 
         // Message label
         messageLabel = new JLabel("", SwingConstants.CENTER);
@@ -81,34 +78,43 @@ public class LoginScreen extends JFrame {
         gbc.insets = new Insets(10, 10, 10, 10);
         add(messageLabel, gbc);
 
-        // Add action listener for the login button
-        loginButton.addActionListener(e -> handleLogin());
+        // Login button 
+        ColoredButton loginButton = new ColoredButton("Login");
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
+        gbc.insets = new Insets(20, 10, 10, 10);
+        gbc.anchor = GridBagConstraints.CENTER;
+
+        loginButton.addActionListener(e -> {
+            String username = usernameField.getText();
+            String password = new String(passwordField.getPassword());
+            loginController.login(username, password);  // Just delegate to controller
+        });
+
+        add(loginButton, gbc);
 
         setVisible(true);
     }
 
-    private void handleLogin() {
-        String username = usernameField.getText();
-        String password = new String(passwordField.getPassword());
+    @Override
+    public void updateMessageLabel(String message, boolean success) {
+        messageLabel.setForeground(success ? new Color(0, 128, 0) : Color.RED);
+        messageLabel.setText(message);
+    }
 
-        UserDatabase userDatabase = new UserDatabase();
-        // userDatabase.addUser(new Instructor("pelier", "password", "pelier@arizona.edu", "Pelier", false));
-        // userDatabase.addUser(new Instructor("andy", "password", "andy@arizona.edu", "Andy", false));
-        User user = userDatabase.getUser(username, password);
+    @Override
+    public void navigateToInstructorApplication(Instructor instructor) {
+        updateMessageLabel("Login successful!", true);
+        new InstructorApplication(instructor);
+        this.dispose();  // Close login screen
+    }
 
-        if (user != null) {
-            messageLabel.setForeground(new Color(0, 128, 0));
-            messageLabel.setText("Login successful!");
-            if (user instanceof Instructor) {
-                // new CalendarView((Instructor) user);
-                new InstructorApplication((Instructor) user);
-            } else if (user instanceof Student) {
-                new CalendarView((Student) user);
-            }
-        } else {
-            messageLabel.setForeground(Color.RED);
-            messageLabel.setText("Username or password is incorrect.");
-        }
+    @Override
+    public void navigateToStudentApplication(Student student) {
+        updateMessageLabel("Login successful!", true);
+        new CalendarView(student);
+        this.dispose();
     }
 
     public static void main(String[] args) {
