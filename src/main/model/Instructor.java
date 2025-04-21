@@ -6,11 +6,29 @@ import java.util.HashMap;
 
 public class Instructor extends User {
     private ArrayList<Course> coursesManaged;
+    private String courseTest;
+    
+    public Instructor(String username, String password, String email, boolean isHashed) {
+        super(username, password, email, isHashed);
+        this.coursesManaged = new ArrayList<Course>();
+    }
 
+    public void setCourse(String courseTest) {
+    	this.courseTest = courseTest;
+    }
+    
     public Instructor(String username, String password, String email, String name, boolean isHashed) {
-        super(username, password, email, name, isHashed);
-        HashMap<String, Category> categoryWeights = new HashMap<>();
+        super(username, password, email, isHashed);
+        this.coursesManaged = new ArrayList<Course>();
+        
+    }
 
+     public void addDetailsClass() {
+    	    if (coursesManaged.isEmpty()) return;
+    	    
+    	    Course csc335 = coursesManaged.get(coursesManaged.size() - 1); // Get most recently added
+    	    
+         HashMap<String, Category> categoryWeights = new HashMap<>();
         //TODO: remove this default course
         categoryWeights.put("Short Assignments", new Category("Short Assignments", 125));  
         categoryWeights.put("Large Assignments", new Category("Large Assignments", 100));
@@ -25,6 +43,13 @@ public class Instructor extends User {
             new ArrayList<Days>(Arrays.asList(Days.MONDAY, Days.TUESDAY, Days.WEDNESDAY, Days.THURSDAY, Days.FRIDAY)), 
             categoryWeights, 
             "CSC 335");
+        //this.coursesManaged = new ArrayList<Course>();
+//        Course csc335 = new Course(
+//        		coursesManaged.get(0).getName(), 
+//            new ArrayList<Days>(Arrays.asList(Days.MONDAY, Days.TUESDAY, Days.WEDNESDAY, Days.THURSDAY, Days.FRIDAY)), 
+//            categoryWeights);
+//        
+        csc335.setCategoryWeights(categoryWeights);
         //TODO: remove the default assignments
         // Adding Quizzes 1-7
         for (int i = 1; i <= 7; i++) {
@@ -52,10 +77,17 @@ public class Instructor extends User {
         addCourse(csc335);
     }
 
+    
     public void addCourse(Course course) {
         this.coursesManaged.add(course);
         course.addInstructor(this);
     }
+
+    
+    public String getName() {
+    	return this.username;
+    }
+    
 
     public ArrayList<Course> getCoursesForDay(Days day) {
         ArrayList<Course> courses = new ArrayList<Course>();

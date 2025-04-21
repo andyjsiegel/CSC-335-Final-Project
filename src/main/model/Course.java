@@ -8,22 +8,118 @@ import javax.swing.*;
 import java.awt.*;
 
 public class Course {
-    private ArrayList<Student> students;
-    private ArrayList<Instructor> instructors;
-    private HashMap<String, Category> categories;
-    private String name;
     private ArrayList<Days> daysOfWeek;
     private String courseCode;
+    
+    
+    
+    private StudentList studentList;
+    private CourseAssignments assignments;
+    private HashMap<String, Category> categories;
 
-    public Course(String name, ArrayList<Days> daysOfWeek, HashMap<String,Category> categories, String courseCode) {
-        this.name = name;
-        this.courseCode = courseCode;
-        this.students = new ArrayList<Student>();
-        this.instructors = new ArrayList<Instructor>();
-        this.categories = categories;
-        this.daysOfWeek = daysOfWeek;
+    public CourseAssignments getAssignments() {
+    	return assignments;
     }
+    public String getDescription() {
+    	return this.description;
+    }
+    
+    public StudentList getStudents() {
+    	return studentList;
+    }
+    
+    public int getCredits() {
+    	return credits;
+    }
+	/*
+	 * A normal course, for instance, we would get 
+	 * 
+	 * CSC 335 - Object-Oriented Programming and Design
+	 * 3.00 Units
+	 * 
+	 * Class Code
+	 * 48423
+	 * 
+	 * [DESCRIPTION]
+	 * 
+	 */
+    public Course(String name, String description, int credits, String courseCode) {
 
+    	this.name = name;
+    	this.description = description;
+    	this.credits = credits;
+    	this.courseCode = courseCode;
+        this.instructors = new ArrayList<Instructor>();
+    	this.studentList = new StudentList();		// each course has a student List
+    	this.assignments = new CourseAssignments();
+    }
+    
+    public void setCategoryWeights(HashMap<String, Category> categories) {
+        this.categories = categories;
+    }
+    
+    public String getCourseCode() {
+    	return this.courseCode;
+    }
+    public void addStudent(Student student) {
+    	this.studentList.addStudent(new Student(student));
+    }
+    
+    
+    public void removeStudent(Student student) {
+    	this.studentList.removeStudent(student);
+
+    }
+    
+    
+    public void addAssignment(Assignment assignment) {
+    	this.assignments.addAssignment(assignment);
+    }
+    
+    
+    public void removeAssignment(Assignment assignment) {
+    	this.assignments.removeAssignment(assignment);
+    }
+    
+    
+
+	
+    /* 
+     * One Course, let's say the name of it is CSC 335
+     * Things/ Methods that need to be added for the Course.java class:
+     * 
+     * 
+     * 
+     * Import a list of students to add to the course: Well i guess same idea, it involvs modyfing the StudentList class
+     * View the students enrolled in a course: easy enough, just make a method in student list
+     * 
+     * Calculate class averages and medians: easy enough, a student has a student gradeBook, and that cotnains the 
+     * 				average of the student, the total points, etc all neeeded for median/average.
+     * sort students by grades on an assingment : easy enough again, we just have to add the students first and then do allat
+     * 
+     * 	View ungraded assignments.			(meaning an assingment must have a graded flag, (( if graded = true, cant modify grade? prob not))
+	 	Choose a mode for calculating class averages. ( no idea what this even means ngl)
+		Set up categories of assignments with weights, allowing for dropped assignments. (so basically modify the assignments class again
+						this is a bit more complex i guess but it should still work relatively the same way ??
+						-> so adding a catergory to an assignment, prob not worth to make a category class but worth looking into
+
+     * 
+     */
+    
+    public void addDays(ArrayList<Days> daysOfWeek) {
+    	this.daysOfWeek = daysOfWeek;
+    }
+    
+
+
+    
+    
+    
+
+    public String getCode() {
+    	return courseCode;
+    }
+    
     public JTabbedPane getCourseView() {
         // Main panel with course details
         JPanel panel = new JPanel();
@@ -99,8 +195,6 @@ public class Course {
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Course Info", panel);
     
-        // Placeholder panel for assignments tab (you can add content later)
-       // Assignments panel with collapsible sections
         JPanel assignmentsPanel = new JPanel();
         assignmentsPanel.setLayout(new BoxLayout(assignmentsPanel, BoxLayout.Y_AXIS));
         ArrayList<String> categorieTitles = new ArrayList<String>(categories.keySet());
@@ -125,7 +219,7 @@ public class Course {
             int pointsEarned = 0;
             int pointsPossible = categories.get(category).getPoints();
             for (Assignment assignment : assignments) {
-                assignment.setGradeTo100();
+                //assignment.setGradeTo100();
                 if(assignment.getPointsEarned() != null) {
                     pointsEarned += assignment.getPointsEarned();
                     numGraded++;
@@ -160,33 +254,57 @@ public class Course {
         return tabbedPane;
     }
     
-    public String getCode() {
-        return courseCode;
-    }
-
-    public void addInstructor(Instructor instructor) {
-        this.instructors.add(instructor);
-    }
-
-    public void addAssignment(Assignment assignment) {
-        String category = assignment.getCategory();
-        if (categories.containsKey(category)) {
-            categories.get(category).addAssignment(assignment);
-        } else {
-            throw new IllegalArgumentException("Category " + category + " does not exist on course " + name);
-        }
-    }
-
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     @Override
     public String toString() {
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("h:mm a");
         StringBuilder sb = new StringBuilder();
         sb.append("Course Code: ").append(courseCode).append("\n");
         sb.append("Course Name: ").append(name).append("\n");
-        // sb.append("Schedule: ").append(String.join(", ", daysOfWeek)).append("\n");
-        sb.append("Category Weights:\n");
-
-        for (String category : categories.keySet()) {
-            sb.append("  ").append(category).append(": ").append(categories.get(category)).append("\n");
+        sb.append("Description: ").append(description).append("\n");
+        sb.append("Credits: ").append(credits).append("\n");
+        
+        // Only show time if it's set
+        if (startTime != null && endTime != null) {
+            sb.append("Time: ").append(startTime.format(timeFormatter))
+              .append(" - ").append(endTime.format(timeFormatter)).append("\n");
+        }
+        
+        // Only show weights if they exist
+        if (categoryWeights != null && !categoryWeights.isEmpty()) {
+            sb.append("Category Weights:\n");
+            for (String category : categoryWeights.keySet()) {
+                sb.append("  ").append(category).append(": ")
+                  .append(categoryWeights.get(category)).append("\n");
+            }
         }
 
         return sb.toString();
@@ -195,8 +313,16 @@ public class Course {
     public String getName() {
         return name;
     }
-
+  
+    public long getDuration() {
+        return Duration.between(startTime, endTime).toMinutes();
+    }
     public ArrayList<Days> getDays() {
         return daysOfWeek;
     }
+    
+    public void addInstructor(Instructor instructor) {
+        this.instructors.add(instructor);
+    }
+
 }

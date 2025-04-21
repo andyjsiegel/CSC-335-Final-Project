@@ -4,16 +4,21 @@ import javax.swing.*;
 
 import main.model.Course;
 import main.model.Days;
+import main.model.Instructor;
 import main.model.User;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.*;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class CalendarView extends JFrame {
 
     public CalendarView(User user) {
+    	  saveUser = user;
         // Set the title and size of the window
         setTitle("Calendar View");
         setSize(1000, 600);
@@ -49,11 +54,11 @@ public class CalendarView extends JFrame {
         addClassButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Replace the current menu with the "Add Class" window
                 getContentPane().removeAll();
-                getContentPane().add(new AddClassView(), BorderLayout.CENTER);
+                //getContentPane().add(new AddClassView(), BorderLayout.CENTER);
                 revalidate();
                 repaint();
+                //new CalendarView((Instructor) user);
             }
         });
         settingsPanel.add(addClassButton, BorderLayout.EAST);
@@ -63,38 +68,32 @@ public class CalendarView extends JFrame {
         JPanel centerPanel = new JPanel(new GridLayout(1, 7)); // 7 columns for days of the week
         centerPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
 
-        // Days of the week using the Days enum
         for (Days day : Days.values()) {
             JPanel dayPanel = new JPanel();
             dayPanel.setLayout(new BoxLayout(dayPanel, BoxLayout.Y_AXIS));
             dayPanel.setBorder(BorderFactory.createTitledBorder(day.name()));
-            user.getCoursesForDay(day).forEach(course -> {
-                // ClassLabelButton classLabel = new ClassLabelButton(this, course);
-                JButton classLabel = new JButton(course.getName());
-                classLabel.setText("<html><center>"+course.getName()+"</center></html>");
-                classLabel.addActionListener(e -> {
-                    // JOptionPane.showMessageDialog(null, "You clicked on the class label for " + course.getName() + "!");
-                    JOptionPane.showMessageDialog(null, course.getCourseView(), course.getCode(), JOptionPane.PLAIN_MESSAGE);
-
-                });
-                
-                dayPanel.add(classLabel);
-            });
-            // TODO: Have a calander like view to see all upcoming classes, reuqires an iterator for Courses in Instructor
-            /*
-            for (Course course : instructor.getCoursesForDay(day)) {
-            JLabel classLabel = new JLabel(course.getName()); // Assuming Course has a getName() method
-            classLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-            dayPanel.add(classLabel);
+            
+            // track displayed courses and avoid duplicates
+            Set<String> displayedCourses = new HashSet<>();
+            
+            for (Course course : user.getCoursesForDay(day)) {
+                // Only add if we haven't displayed this course yet
+                if (!displayedCourses.contains(course.getCourseCode())) {
+                    JButton classLabel = new JButton(course.getName());
+                    classLabel.setText("<html><center>"+course.getName()+"<br>("+course.getCourseCode()+")</center></html>");
+                    classLabel.addActionListener(e -> {
+                    	 JOptionPane.showMessageDialog(null, course.getCourseView(), course.getCode(), JOptionPane.PLAIN_MESSAGE);
+                    });
+                    
+                    dayPanel.add(classLabel);
+                    displayedCourses.add(course.getCourseCode());
+                }
             }
-            */
-
+            
             centerPanel.add(dayPanel);
         }
 
         add(centerPanel, BorderLayout.CENTER);
-
-        setVisible(true);
     }
 
     // Dummy AddClassView class for demonstration
@@ -107,3 +106,8 @@ public class CalendarView extends JFrame {
         }
     }
 }
+        setVisible(true);
+    }
+}
+
+
