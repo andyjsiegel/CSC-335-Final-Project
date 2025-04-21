@@ -100,7 +100,8 @@ public class LoginScreen extends JFrame {
             messageLabel.setForeground(new Color(0, 128, 0));
             messageLabel.setText("Login successful!");
             if (user instanceof Instructor) {
-                new CalendarView((Instructor) user);
+                // new CalendarView((Instructor) user);
+                new InstructorApplication((Instructor) user);
             } else if (user instanceof Student) {
                 new CalendarView((Student) user);
             }
