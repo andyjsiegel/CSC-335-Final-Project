@@ -11,14 +11,6 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 public class Course {
-    private ArrayList<Student> students;
-    private ArrayList<Instructor> instructors;
-    private HashMap<String, Double> categoryWeights;
-    private String name;
-    private String description;
-    private int credits;
-    private LocalTime startTime;
-    private LocalTime endTime;
     private ArrayList<Days> daysOfWeek;
     private String courseCode;
     
@@ -27,21 +19,6 @@ public class Course {
     private StudentList studentList;
     private CourseAssignments assignments;
     private HashMap<String, Category> categories;
-    
-    public Course(String name, String description, int credits, ArrayList<String> daysOfWeek, LocalTime startTime, LocalTime endTime, HashMap<String, Double> categoryWeights, String courseCode) {
-        this.name = name;
-        this.description = description;
-        this.courseCode = courseCode;
-        this.credits = credits;
-     
-        //this.students = new ArrayList<Student>();
-        this.instructors = new ArrayList<Instructor>();
-        this.categoryWeights = categoryWeights;
-       // this.daysOfWeek = new ArrayList<String>();
-        this.startTime = startTime;
-        this.endTime = endTime;
-       // this.daysOfWeek = daysOfWeek;
-    }
 
     public CourseAssignments getAssignments() {
     	return assignments;

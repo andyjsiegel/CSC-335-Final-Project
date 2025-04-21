@@ -8,13 +8,13 @@ import java.util.Base64;
 public abstract class User {
     protected String username;
     protected String password;
-    protected String name;
+    protected String email;
 
-    public User(String username, String password, String name, boolean isHashed) {
+    public User(String username, String password, String email, boolean isHashed) {
         this.username = username;
         if(isHashed) this.password = password;
         else this.password = hashPassword(password);
-        this.name = name;
+        this.email = email;
     }
 
 
