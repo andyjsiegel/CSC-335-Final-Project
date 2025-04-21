@@ -10,48 +10,45 @@ import java.awt.*;
 public class Course {
     private ArrayList<Days> daysOfWeek;
     private String courseCode;
-    
-    
-    
+    private String name;
+    private String description;
     private StudentList studentList;
     private CourseAssignments assignments;
     private HashMap<String, Category> categories;
+    private ArrayList<Instructor> instructors;
 
-    public CourseAssignments getAssignments() {
-    	return assignments;
-    }
-    public String getDescription() {
-    	return this.description;
-    }
     
-    public StudentList getStudents() {
-    	return studentList;
-    }
-    
-    public int getCredits() {
-    	return credits;
-    }
 	/*
-	 * A normal course, for instance, we would get 
-	 * 
-	 * CSC 335 - Object-Oriented Programming and Design
-	 * 3.00 Units
-	 * 
-	 * Class Code
-	 * 48423
-	 * 
-	 * [DESCRIPTION]
-	 * 
-	 */
-    public Course(String name, String description, int credits, String courseCode) {
-
-    	this.name = name;
+    * A normal course, for instance, we would get 
+    * 
+    * Course Code: CSC 335
+    * Name: Object-Oriented Programming and Design
+    * 3.00 Units
+    * 
+    * 
+    * [DESCRIPTION]
+    * 
+    */
+    public Course(String name, String description, String courseCode) {
+        
+        this.name = name;
     	this.description = description;
-    	this.credits = credits;
     	this.courseCode = courseCode;
         this.instructors = new ArrayList<Instructor>();
     	this.studentList = new StudentList();		// each course has a student List
     	this.assignments = new CourseAssignments();
+        this.daysOfWeek = new ArrayList<Days>();
+    }
+
+    public CourseAssignments getAssignments() {
+        return assignments;
+    }
+    public String getDescription() {
+        return this.description;
+    }
+    
+    public StudentList getStudents() {
+        return studentList;
     }
     
     public void setCategoryWeights(HashMap<String, Category> categories) {
@@ -110,12 +107,6 @@ public class Course {
     	this.daysOfWeek = daysOfWeek;
     }
     
-
-
-    
-    
-    
-
     public String getCode() {
     	return courseCode;
     }
@@ -197,9 +188,9 @@ public class Course {
     
         JPanel assignmentsPanel = new JPanel();
         assignmentsPanel.setLayout(new BoxLayout(assignmentsPanel, BoxLayout.Y_AXIS));
-        ArrayList<String> categorieTitles = new ArrayList<String>(categories.keySet());
-        Collections.sort(categorieTitles);
-        for (String category : categorieTitles) {
+        ArrayList<String> categoryTitles = new ArrayList<String>(categories.keySet());
+        Collections.sort(categoryTitles);
+        for (String category : categoryTitles) {
             ArrayList<Assignment> assignments = categories.get(category).getAssignments();
 
             // Header button for collapsible section
@@ -220,8 +211,8 @@ public class Course {
             int pointsPossible = categories.get(category).getPoints();
             for (Assignment assignment : assignments) {
                 //assignment.setGradeTo100();
-                if(assignment.getPointsEarned() != null) {
-                    pointsEarned += assignment.getPointsEarned();
+                if(assignment.getGrade() >= 0) {
+                    pointsEarned += assignment.getGrade();
                     numGraded++;
                 }
                 JLabel assignmentLabel = new JLabel(assignment.getTitle() + " : " + assignment.getGrade());
@@ -254,56 +245,20 @@ public class Course {
         return tabbedPane;
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     @Override
     public String toString() {
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("h:mm a");
         StringBuilder sb = new StringBuilder();
         sb.append("Course Code: ").append(courseCode).append("\n");
         sb.append("Course Name: ").append(name).append("\n");
         sb.append("Description: ").append(description).append("\n");
-        sb.append("Credits: ").append(credits).append("\n");
         
-        // Only show time if it's set
-        if (startTime != null && endTime != null) {
-            sb.append("Time: ").append(startTime.format(timeFormatter))
-              .append(" - ").append(endTime.format(timeFormatter)).append("\n");
-        }
         
         // Only show weights if they exist
-        if (categoryWeights != null && !categoryWeights.isEmpty()) {
+        if (categories != null && !categories.isEmpty()) {
             sb.append("Category Weights:\n");
-            for (String category : categoryWeights.keySet()) {
+            for (String category : categories.keySet()) {
                 sb.append("  ").append(category).append(": ")
-                  .append(categoryWeights.get(category)).append("\n");
+                  .append(categories.get(category)).append("\n");
             }
         }
 
@@ -314,9 +269,6 @@ public class Course {
         return name;
     }
   
-    public long getDuration() {
-        return Duration.between(startTime, endTime).toMinutes();
-    }
     public ArrayList<Days> getDays() {
         return daysOfWeek;
     }

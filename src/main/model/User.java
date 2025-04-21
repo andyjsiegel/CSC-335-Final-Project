@@ -32,8 +32,9 @@ public abstract class User {
     };
     
 
-    public User(String username, String password, boolean isHashed) {
+    public User(String username, String password, String name, boolean isHashed) {
         this.username = username;
+        this.name = name;
         if(isHashed) {
             this.password = password;
         } else {

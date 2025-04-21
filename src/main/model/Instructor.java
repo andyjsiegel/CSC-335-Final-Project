@@ -8,8 +8,8 @@ public class Instructor extends User {
     private ArrayList<Course> coursesManaged;
     private String courseTest;
     
-    public Instructor(String username, String password, String email, boolean isHashed) {
-        super(username, password, email, isHashed);
+    public Instructor(String username, String password, String name, boolean isHashed) {
+        super(username, password, name, isHashed);
         this.coursesManaged = new ArrayList<Course>();
     }
 
@@ -17,16 +17,11 @@ public class Instructor extends User {
     	this.courseTest = courseTest;
     }
     
-    public Instructor(String username, String password, String email, String name, boolean isHashed) {
-        super(username, password, email, isHashed);
-        this.coursesManaged = new ArrayList<Course>();
-        
-    }
 
      public void addDetailsClass() {
-    	    if (coursesManaged.isEmpty()) return;
+        if (coursesManaged.isEmpty()) return;
     	    
-    	    Course csc335 = coursesManaged.get(coursesManaged.size() - 1); // Get most recently added
+        Course csc335 = coursesManaged.get(coursesManaged.size() - 1); // Get most recently added
     	    
          HashMap<String, Category> categoryWeights = new HashMap<>();
         //TODO: remove this default course
@@ -38,11 +33,6 @@ public class Instructor extends User {
         categoryWeights.put("Final Exam", new Category("Final Exam", 200));
 
         this.coursesManaged = new ArrayList<Course>();
-        Course csc335 = new Course(
-            "Object Oriented Programming", 
-            new ArrayList<Days>(Arrays.asList(Days.MONDAY, Days.TUESDAY, Days.WEDNESDAY, Days.THURSDAY, Days.FRIDAY)), 
-            categoryWeights, 
-            "CSC 335");
         //this.coursesManaged = new ArrayList<Course>();
 //        Course csc335 = new Course(
 //        		coursesManaged.get(0).getName(), 

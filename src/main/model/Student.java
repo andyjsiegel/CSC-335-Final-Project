@@ -16,6 +16,8 @@ public class Student extends User {
     public String getName() {
     	return name;
     }
+
+	//copy constructor
     public Student(Student other) {
         super(other.username, other.password, other.name, true);
         this.gradebook = new StudentGradebook();
@@ -26,13 +28,8 @@ public class Student extends User {
 			public int compare(Student s1, Student s2) {
 				int nameCompare = s1.username.compareToIgnoreCase(s2.username);
 				return nameCompare;
-				}
 			}
 		};
-	}
-
-	public ArrayList<Course> getCoursesForDay(Days day) {
-		return coursesTaken;
 	}
 	
 	public static Comparator<Student> sortByUsername() {
