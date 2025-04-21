@@ -18,11 +18,11 @@ import java.util.Set;
 public class CalendarView extends JFrame {
 
     public CalendarView(User user) {
-    	  saveUser = user;
+        User saveUser = user;
         // Set the title and size of the window
         setTitle("Calendar View");
         setSize(1000, 600);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
         // Create a panel for the top section
@@ -46,23 +46,6 @@ public class CalendarView extends JFrame {
         userPanel.add(logoutButton, BorderLayout.EAST);
         add(userPanel, BorderLayout.NORTH);
 
-        JPanel settingsPanel = new JPanel(new BorderLayout());
-        settingsPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
-        settingsPanel.setBackground(Color.GRAY);
-
-        JButton addClassButton = new JButton("Add Class");
-        addClassButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                getContentPane().removeAll();
-                //getContentPane().add(new AddClassView(), BorderLayout.CENTER);
-                revalidate();
-                repaint();
-                //new CalendarView((Instructor) user);
-            }
-        });
-        settingsPanel.add(addClassButton, BorderLayout.EAST);
-        add(settingsPanel, BorderLayout.SOUTH);
 
         // Create a panel for the center section
         JPanel centerPanel = new JPanel(new GridLayout(1, 7)); // 7 columns for days of the week
@@ -94,18 +77,6 @@ public class CalendarView extends JFrame {
         }
 
         add(centerPanel, BorderLayout.CENTER);
-    }
-
-    // Dummy AddClassView class for demonstration
-    private class AddClassView extends JPanel {
-        public AddClassView() {
-            setLayout(new BorderLayout());
-            JLabel label = new JLabel("Add Class Window");
-            label.setHorizontalAlignment(SwingConstants.CENTER);
-            add(label, BorderLayout.CENTER);
-        }
-    }
-}
         setVisible(true);
     }
 }
