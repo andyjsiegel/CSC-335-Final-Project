@@ -24,10 +24,10 @@ public class StudentGradebook {
 	
 
 	// must pass a copy of Assignments to this first btw 
-	public void addAssignment(Assignment assignment, String grade) {
+	public void addAssignment(Assignment assignment, double grade) {
 		assignment.setGrade(grade);
 		this.courseAssignments.add(assignment);
-		this.points += Double.parseDouble(grade);
+		this.points += grade;
 		this.assignmentCount++;
 	}
 	
@@ -36,7 +36,7 @@ public class StudentGradebook {
 		int totalPoints = 0;
 		
 		for (Assignment assignment : courseAssignments) {
-			totalPoints += Double.parseDouble(assignment.getTotalPoints());
+			totalPoints += assignment.getMaxPoints();
 		}
 		
 		classAverage = (totalPoints / points) * 100;
@@ -71,7 +71,7 @@ public class StudentGradebook {
 	    ArrayList<Double> grades = new ArrayList<>();
 	    
 	    for (Assignment assignment : courseAssignments) {
-	        grades.add(Double.parseDouble(assignment.getGrade())); 
+	        grades.add(assignment.getGrade()); 
 	    }
 
 	    Collections.sort(grades);
