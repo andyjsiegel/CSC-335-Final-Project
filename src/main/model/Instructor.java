@@ -37,6 +37,12 @@ public class Instructor extends User {
         categoryWeights.put("Midterms", new Category("Midterms", 300));
         categoryWeights.put("Final Exam", new Category("Final Exam", 200));
 
+        this.coursesManaged = new ArrayList<Course>();
+        Course csc335 = new Course(
+            "Object Oriented Programming", 
+            new ArrayList<Days>(Arrays.asList(Days.MONDAY, Days.TUESDAY, Days.WEDNESDAY, Days.THURSDAY, Days.FRIDAY)), 
+            categoryWeights, 
+            "CSC 335");
         //this.coursesManaged = new ArrayList<Course>();
 //        Course csc335 = new Course(
 //        		coursesManaged.get(0).getName(), 
@@ -70,6 +76,7 @@ public class Instructor extends User {
         csc335.addAssignment(new Assignment("Final Exam", "Final Exam", 200));
         addCourse(csc335);
     }
+
     
     public void addCourse(Course course) {
         this.coursesManaged.add(course);
@@ -90,6 +97,5 @@ public class Instructor extends User {
             }
         }
         return courses;
-        
     }
 }

@@ -17,9 +17,8 @@ import java.util.Set;
 
 public class CalendarView extends JFrame {
 
-	User saveUser;
     public CalendarView(User user) {
-    	saveUser = user;
+    	  saveUser = user;
         // Set the title and size of the window
         setTitle("Calendar View");
         setSize(1000, 600);
@@ -95,6 +94,18 @@ public class CalendarView extends JFrame {
         }
 
         add(centerPanel, BorderLayout.CENTER);
+    }
+
+    // Dummy AddClassView class for demonstration
+    private class AddClassView extends JPanel {
+        public AddClassView() {
+            setLayout(new BorderLayout());
+            JLabel label = new JLabel("Add Class Window");
+            label.setHorizontalAlignment(SwingConstants.CENTER);
+            add(label, BorderLayout.CENTER);
+        }
+    }
+}
         setVisible(true);
     }
 }

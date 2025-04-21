@@ -6,9 +6,6 @@ import java.util.HashMap;
 
 import javax.swing.*;
 import java.awt.*;
-import java.time.Duration;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
 public class Course {
     private ArrayList<Days> daysOfWeek;
@@ -71,6 +68,7 @@ public class Course {
     
     public void removeStudent(Student student) {
     	this.studentList.removeStudent(student);
+
     }
     
     
@@ -311,36 +309,14 @@ public class Course {
 
         return sb.toString();
     }
-
-    public JPanel createEventPanel() {
-        // Calculate duration in minutes
-        long duration = Duration.between(startTime, endTime).toMinutes();
-        // Set panel height based on duration
-        int panelHeight = (int) duration * 2; // For example, 2 pixels per minute
-        JPanel panel = new JPanel();
-        panel.setPreferredSize(new Dimension(200, panelHeight));
-        panel.setBackground(Color.BLUE);
-        panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-
-        // Add label for course name
-        JLabel label = new JLabel(name);
-        label.setForeground(Color.WHITE);
-        panel.add(label);
-
-        return panel;
-    }
+    
     public String getName() {
         return name;
     }
-    public LocalTime getStartTime() {
-        return startTime;
-    }
-    public LocalTime getEndTime() {
-        return endTime;
-    }
+  
     public long getDuration() {
         return Duration.between(startTime, endTime).toMinutes();
-  }
+    }
     public ArrayList<Days> getDays() {
         return daysOfWeek;
     }

@@ -9,12 +9,14 @@ public abstract class User {
     protected String username;
     protected String password;
     protected String email;
+    protected String name;
 
-    public User(String username, String password, String email, boolean isHashed) {
+    public User(String username, String password, String email, String name, boolean isHashed) {
         this.username = username;
         if(isHashed) this.password = password;
         else this.password = hashPassword(password);
         this.email = email;
+        this.name = name;
     }
 
 
@@ -39,8 +41,6 @@ public abstract class User {
         }
     }
 
-    
-
     // Public static method in order to use in other classes to validate log in.
     public static String hashPassword(String password) {
         MessageDigest md = null;
@@ -58,6 +58,14 @@ public abstract class User {
     public String getHashedPassword() {
         return password;
     }
-    
+
+    public String getName() {
+        return name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
     public abstract ArrayList<Course> getCoursesForDay(Days day);
 }

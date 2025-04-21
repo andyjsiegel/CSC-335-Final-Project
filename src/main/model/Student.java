@@ -30,6 +30,10 @@ public class Student extends User {
 			}
 		};
 	}
+
+	public ArrayList<Course> getCoursesForDay(Days day) {
+		return coursesTaken;
+	}
 	
 	public static Comparator<Student> sortByUsername() {
 		return new Comparator<Student>() {
@@ -47,5 +51,4 @@ public class Student extends User {
 	public ArrayList<Course> getCoursesForDay(Days day) {
 		return coursesTaken;
 	}
-	
 }
