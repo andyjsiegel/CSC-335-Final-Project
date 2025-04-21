@@ -12,6 +12,9 @@ public class CourseAssignments implements Iterable<Assignment>{
 		this.courseAssignments = new ArrayList<>();
 	}
 
+	public int size() {
+		return courseAssignments.size();
+	}
 
 	// need to pass a copy first 
 	public void addAssignment(Assignment assignment) {
