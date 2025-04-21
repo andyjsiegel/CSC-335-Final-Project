@@ -193,7 +193,7 @@ public class InstructorApplication extends JFrame {
                 int credits = Integer.parseInt(creditsField.getText());
                 String courseCode = courseCodeField.getText();
                 
-                Course newCourse = new Course(name, description, credits, courseCode);
+                Course newCourse = new Course(name, description, courseCode);
                 
                 // Add only selected days
                 ArrayList<Days> selectedDays = new ArrayList<>();
@@ -292,7 +292,7 @@ public class InstructorApplication extends JFrame {
             try {
                 String name = nameField.getText();
                 String description = descriptionArea.getText();
-                String totalPoints = totalPointsField.getText();
+                Double totalPoints = Double.parseDouble(totalPointsField.getText());
                 
                 Assignment newAssignment = new Assignment(name, description, totalPoints);
                 course.addAssignment(newAssignment);
@@ -336,7 +336,6 @@ public class InstructorApplication extends JFrame {
         sb.append("Course Name: ").append(course.getName()).append("\n");
         sb.append("Course Code: ").append(course.getCourseCode()).append("\n");
         sb.append("Description: ").append(course.getDescription()).append("\n");
-        sb.append("Credits: ").append(course.getCredits()).append("\n\n");
 
         sb.append("Students:\n");
         for (Student student : course.getStudents()) {
@@ -344,9 +343,10 @@ public class InstructorApplication extends JFrame {
         }
 
         sb.append("\nAssignments:\n");
+        System.out.println(course.getAssignments().size());
         for (Assignment assignment : course.getAssignments()) {
             sb.append("- ").append(assignment.getName())
-              .append(" (").append(assignment.getTotalPoints()).append(" points)\n");
+              .append(" (").append(assignment.getMaxPoints()).append(" points)\n");
         }
 
         infoArea.setText(sb.toString());
@@ -368,7 +368,7 @@ public class InstructorApplication extends JFrame {
     public static void main(String[] args) {
 
         //Instructor instructor = new Instructor("instructor1", "pass123", "Dr. Smith", false);
-    	Instructor instructor = new Instructor("instructor1", "pass123", "Dr. Smith", "john", false);
+    	Instructor instructor = new Instructor("instructor1", "pass123", "Dr. Smith", false);
         
         SwingUtilities.invokeLater(() -> new InstructorApplication(instructor));
     }
