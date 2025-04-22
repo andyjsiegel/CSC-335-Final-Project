@@ -5,30 +5,44 @@ import main.model.Instructor;
 import main.model.Student;
 import main.model.User;
 import main.model.UserDatabase;
-import main.observer.LoginViewObserver;
+import main.view.LoginScreen;
 
 public class LoginController {
 
-    private final LoginViewObserver observer;
+    private final LoginScreen ls;
+    private UserDatabase userDatabase = new UserDatabase();
 
-    public LoginController(LoginViewObserver observer) {
-        this.observer = observer;
+    public LoginController(LoginScreen ls) {
+        this.ls = ls;
     }
 
     public void login(String username, String password) {
 
-        UserDatabase userDatabase = new UserDatabase();
-        userDatabase.addUser(new Instructor("pelier", "password", "pelier@arizona.edu", false));
         User user = userDatabase.getUser(username, password);
 
         if (user != null) {
             if (user instanceof Instructor) {
-                observer.navigateToInstructorApplication((Instructor) user);
+                ls.navigateToInstructorView((Instructor) user);
             } else if (user instanceof Student) {
-                observer.navigateToStudentApplication((Student) user);
+                ls.navigateToStudentView((Student) user);
             }
         } else {
-            observer.updateMessageLabel("Username or password is incorrect.", false);
+            ls.updateMessageLabel("Username or password is incorrect.", false);
         }
+    }
+
+    public void register(String username, String password, String firstname, String lastname, String email, Boolean userType) {
+
+        if (username == null || password == null || firstname == null || lastname == null || email == null || userType == null) {
+            ls.updateMessageLabel("All fields are required. Please fill out all fields and try again.", false);
+            return;
+        }
+        if (userType) {
+            userDatabase.addInstructor(username, password, firstname, lastname, email, false);
+        }
+        if (!userType) {
+            userDatabase.addStudent(username, password, firstname, lastname, email, false);
+        }
+        ls.updateMessageLabel("Registration successful! You can now log in.", true);
     }
 }

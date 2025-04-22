@@ -17,12 +17,10 @@ public class StudentGradebook {
 	private ArrayList<Assignment> courseAssignments;
 	private FinalGrades finalGrade;
 	
-	
 	public StudentGradebook() {
 		this.courseAssignments = new ArrayList<>();
 	}
 	
-
 	// must pass a copy of Assignments to this first btw 
 	public void addAssignment(Assignment assignment, double grade) {
 		assignment.setGrade(grade);
@@ -30,7 +28,6 @@ public class StudentGradebook {
 		this.points += grade;
 		this.assignmentCount++;
 	}
-	
 	
 	public void calculateAverage() {
 		int totalPoints = 0;

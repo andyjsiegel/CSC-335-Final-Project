@@ -2,26 +2,22 @@ package main.model;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Base64;
 
 public abstract class User {
     protected String username;
     protected String password;
     protected String email;
-    protected String name;
+    protected String firstname;
+    protected String lastname;
 
-    public User(String username, String password, String email, String name, boolean isHashed) {
+    public User(String username, String password, String firstName, String lastName, String email, boolean isHashed) {
         this.username = username;
         if(isHashed) this.password = password;
         else this.password = hashPassword(password);
+        this.firstname = firstName;
+        this.lastname = lastName;
         this.email = email;
-        this.name = name;
-    }
-
-
-    public String getUsername() {
-        return username;
     }
 
     public static final byte[] salt = new byte[] { 
@@ -30,17 +26,6 @@ public abstract class User {
         (byte)0x9C, (byte)0xAD, (byte)0xBE, (byte)0xCF, 
         (byte)0xD0, (byte)0xE1, (byte)0xF2, (byte)0xFF 
     };
-    
-
-    public User(String username, String password, String name, boolean isHashed) {
-        this.username = username;
-        this.name = name;
-        if(isHashed) {
-            this.password = password;
-        } else {
-            this.password = hashPassword(password);
-        }
-    }
 
     // Public static method in order to use in other classes to validate log in.
     public static String hashPassword(String password) {
@@ -56,17 +41,23 @@ public abstract class User {
         return Base64.getEncoder().encodeToString(hashedPassword);
     }
 
+    public String getUsername() {
+        return username;
+    }
+
     public String getHashedPassword() {
         return password;
     }
 
-    public String getName() {
-        return name;
+    public String getFirstname() {
+        return firstname;
+    }
+
+    public String getLastname() {
+        return lastname;
     }
 
     public String getEmail() {
         return email;
     }
-
-    public abstract ArrayList<Course> getCoursesForDay(Days day);
 }

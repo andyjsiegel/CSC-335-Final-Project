@@ -66,7 +66,4 @@ public class Assignment {
         Assignment other = (Assignment) obj;
         return name.equals(other.name) && dueDate.equals(other.dueDate) && points == other.points; 
     }
-
-
-
 }

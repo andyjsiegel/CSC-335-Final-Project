@@ -2,13 +2,11 @@ package main.view;
 
 import main.controller.LoginController;
 import main.model.*;
-import main.observer.LoginViewObserver;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Calendar;
 
-public class LoginScreen extends JFrame implements LoginViewObserver{
+public class LoginScreen extends JFrame {
   
     private LoginController loginController;
 
@@ -18,10 +16,10 @@ public class LoginScreen extends JFrame implements LoginViewObserver{
 
     public LoginScreen() {
         // Set up the frame
-        loginController = new LoginController(this); 
+        loginController = new LoginController(this);
 
         setTitle("Login");
-        setSize(400, 250);
+        setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new GridBagLayout());
@@ -74,49 +72,62 @@ public class LoginScreen extends JFrame implements LoginViewObserver{
         // Message label
         messageLabel = new JLabel("", SwingConstants.CENTER);
         messageLabel.setFont(font);
-        gbc.gridy = 4;
+        gbc.gridx = 0;
+        gbc.gridwidth = 2; // to center across both columns
+        gbc.gridy = 3;
         gbc.insets = new Insets(10, 10, 10, 10);
         add(messageLabel, gbc);
 
-        // Login button 
+        // Login button
         ColoredButton loginButton = new ColoredButton("Login");
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.gridwidth = 2;
-        gbc.insets = new Insets(20, 10, 10, 10);
-        gbc.anchor = GridBagConstraints.CENTER;
-
         loginButton.addActionListener(e -> {
             String username = usernameField.getText();
             String password = new String(passwordField.getPassword());
-            loginController.login(username, password);  // Just delegate to controller
+            loginController.login(username, password);
         });
-
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.gridwidth = 2;
+        gbc.insets = new Insets(5, 10, 5, 10);
+        gbc.anchor = GridBagConstraints.CENTER;
         add(loginButton, gbc);
+
+        // Register button
+        ColoredButton registerButton = new ColoredButton("Register");
+        registerButton.addActionListener(e -> {
+            new RegisterScreen(loginController);
+            this.dispose();
+        });
+        gbc.gridy = 5; // Place below the login button
+        add(registerButton, gbc);
 
         setVisible(true);
     }
 
-    @Override
+    // Invalid login credentials
+    // Called by the controller to update message label
     public void updateMessageLabel(String message, boolean success) {
         messageLabel.setForeground(success ? new Color(0, 128, 0) : Color.RED);
         messageLabel.setText(message);
     }
 
-    @Override
-    public void navigateToInstructorApplication(Instructor instructor) {
+    // Called by the controller to navigate to the instructor view
+    public void navigateToInstructorView(Instructor instructor) {
         updateMessageLabel("Login successful!", true);
-        new InstructorApplication(instructor);
-        this.dispose();  // Close login screen
-    }
-
-    @Override
-    public void navigateToStudentApplication(Student student) {
-        updateMessageLabel("Login successful!", true);
-        new CalendarView(student);
+        new InstructorView(instructor);
         this.dispose();
     }
 
+    // Called by the controller to navigate to the student view
+    public void navigateToStudentView(Student student) {
+        updateMessageLabel("Login successful!", true);
+        //new StudentView(student);
+        this.dispose();
+    }
+
+
+    // Instructor login: Username:pelier, Password:pass
+    // Student login: Username:pelier1, Password:pass
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new LoginScreen());
     }
