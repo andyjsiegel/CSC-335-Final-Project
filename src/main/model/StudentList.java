@@ -8,35 +8,39 @@ public class StudentList implements Iterable<Student> {
 	// kinda like the same idea of Card/CardStack/Game, but in this case 
 	// we have 					Student/StudentList/Course  :)
 	
-	private ArrayList<Student> studentList;
+	private ArrayList<Student> internalStudentList;
 	
 	
 	public StudentList() {
-		this.studentList = new ArrayList<Student>();
+		this.internalStudentList = new ArrayList<Student>();
+	}
+
+	public StudentList(StudentList other) {
+		this.internalStudentList = new ArrayList<Student>(other.internalStudentList);
 	}
 	
-	public void addStudent(Student student) {
-		studentList.add(student); 
+	public void add(Student student) {
+		internalStudentList.add(student); 
 	}
 
 	
-	public void removeStudent(Student student) {
-		studentList.remove(student);
+	public void remove(Student student) {
+		internalStudentList.remove(student);
 	}
 	
 	
     public void sortByFirstName() {
-        Collections.sort(studentList, Student.sortByFirstName());
+        Collections.sort(internalStudentList, Student.sortByFirstName());
     }
 
     
 	@Override
 	public Iterator<Student> iterator() {
-		return this.studentList.iterator();
+		return this.internalStudentList.iterator();
 	}
 	
 	public boolean isEmpty() {
-		return this.studentList.isEmpty();
+		return this.internalStudentList.isEmpty();
 	}
 	
 	
