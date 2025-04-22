@@ -36,6 +36,10 @@ public class Student extends User {
 		};
 	}
 
+	public String getFullName() {
+		return this.firstname + " " + this.lastname;
+	}
+
 	@Override
 	public String toString() {
 		return "Student " + this.firstname + " " + this.lastname + " with username " + username;

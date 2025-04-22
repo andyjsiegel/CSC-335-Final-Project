@@ -13,7 +13,7 @@ public class Course {
     private String description;
     private Instructor instructor;
     private ArrayList<Days> daysOfWeek;
-    private StudentList studentList;
+    private ArrayList<Student> studentList;
 
     private CourseAssignments assignments;
     private HashMap<String, Category> categories;
@@ -27,7 +27,7 @@ public class Course {
     	this.description = description;
         this.instructor = instructor;
         this.daysOfWeek = new ArrayList<Days>();
-    	this.studentList = new StudentList();
+    	this.studentList = new ArrayList<Student>();
 
         this.assignments = new CourseAssignments();
     }
@@ -46,16 +46,16 @@ public class Course {
         return assignments;
     }
     
-    public StudentList getStudents() {
+    public ArrayList<Student> getStudents() {
         return studentList;
     }
 
     public void addStudent(Student student) {
-    	this.studentList.addStudent(new Student(student));
+    	this.studentList.add(student);
     }
     
     public void removeStudent(Student student) {
-    	this.studentList.removeStudent(student);
+    	this.studentList.remove(student);
     }
     
     public void addAssignment(Assignment assignment) {

@@ -2,12 +2,10 @@ package main.view;
 
 import main.controller.InstructorViewController;
 import main.model.Course;
-import main.model.Instructor;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.List;
 
 public class ListViewClassesPanel extends JPanel {
     private InstructorViewController controller;
@@ -40,27 +38,31 @@ public class ListViewClassesPanel extends JPanel {
     private JPanel createCourseCard(Course course) {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
-
+        panel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); // visual feedback
+    
         JLabel nameLabel = new JLabel("<html><b>" + course.getName() + "</b> (" + course.getCode() + ")</html>");
         JLabel instructorLabel = new JLabel("Instructor: " + course.getInstructor().getFullName());
-
-        
-
-        //JLabel daysLabel = new JLabel("Days: " + String.join(", ", course.getDaysOfWeek()));
+    
         JTextArea descriptionArea = new JTextArea(course.getDescription());
         descriptionArea.setLineWrap(true);
         descriptionArea.setWrapStyleWord(true);
         descriptionArea.setEditable(false);
         descriptionArea.setBackground(panel.getBackground());
-
+    
         JPanel top = new JPanel(new GridLayout(3, 1));
         top.add(nameLabel);
         top.add(instructorLabel);
-        //top.add(daysLabel);
-
+    
         panel.add(top, BorderLayout.NORTH);
         panel.add(descriptionArea, BorderLayout.CENTER);
-
+    
+        // 🎯 Add Mouse Listener to open detail view
+        panel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                new ClassDetailsView(course, controller); // open new window
+            }
+        });
+    
         return panel;
     }
 }

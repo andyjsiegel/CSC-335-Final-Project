@@ -33,7 +33,7 @@ public class InstructorViewController {
             }
         }
 
-        Course course = new Course(className, classDescription, classCode, this.instructor, dayList);
+        Course course = new Course(className, classCode, classDescription, this.instructor, dayList);
         gradebook.addCourse(course);
         instructor.addCourse(course);
     }
