@@ -3,7 +3,7 @@ package main.model;
 import java.util.*;
 
 
-public class StudentList implements Iterable<Student>{
+public class StudentList implements Iterable<Student> {
 	// Technically a course has a student list, which has students innit 
 	// kinda like the same idea of Card/CardStack/Game, but in this case 
 	// we have 					Student/StudentList/Course  :)
@@ -35,7 +35,9 @@ public class StudentList implements Iterable<Student>{
 		return this.studentList.iterator();
 	}
 	
-	
+	public boolean isEmpty() {
+		return this.studentList.isEmpty();
+	}
 	
 	
 }
