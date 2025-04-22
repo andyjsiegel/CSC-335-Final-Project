@@ -1,100 +1,92 @@
 package main.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 import javax.swing.*;
 import java.awt.*;
-import java.time.Duration;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
 public class Course {
-    private ArrayList<Student> students;
-    private ArrayList<Instructor> instructors;
-    private HashMap<String, Double> categoryWeights;
+    private String code;
     private String name;
     private String description;
-    private int credits;
-    private LocalTime startTime;
-    private LocalTime endTime;
-    private ArrayList<String> daysOfWeek;
-    private String courseCode;
+    private Instructor instructor;
+    private ArrayList<Days> daysOfWeek;
+    private ArrayList<Student> studentList;
 
-    public Course(String name, String description, int credits, ArrayList<String> daysOfWeek, LocalTime startTime, LocalTime endTime, HashMap<String, Double> categoryWeights, String courseCode) {
+    private CourseAssignments assignments;
+    private HashMap<String, Category> categories;
+
+    
+    public Course(String name, String code, String description,
+                  Instructor instructor, ArrayList<Days> daysOfWeek) {
+        
         this.name = name;
-        this.description = description;
-        this.courseCode = courseCode;
-        this.credits = credits;
-        this.students = new ArrayList<Student>();
-        this.instructors = new ArrayList<Instructor>();
-        this.categoryWeights = categoryWeights;
-        this.daysOfWeek = new ArrayList<String>();
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.daysOfWeek = daysOfWeek;
-    }
-    //TODO: delete this, it is for
-    public Course(String name, LocalTime startTime, LocalTime endTime) {
-        this.name = name;
-        this.description = "";
-        this.courseCode = "";
-        this.credits = 0;
-        this.students = new ArrayList<Student>();
-        this.instructors = new ArrayList<Instructor>();
-        this.categoryWeights = new HashMap<String, Double>();
-        this.daysOfWeek = new ArrayList<String>();
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.daysOfWeek = new ArrayList<String>();
+        this.code = code;
+    	this.description = description;
+        this.instructor = instructor;
+        this.daysOfWeek = new ArrayList<Days>();
+    	this.studentList = new ArrayList<Student>();
+
+        this.assignments = new CourseAssignments();
     }
 
-    @Override
-    public String toString() {
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("h:mm a"); // Pattern for 12-hour format with AM/PM
-        StringBuilder sb = new StringBuilder();
-        sb.append("Course Code: ").append(courseCode).append("\n");
-        sb.append("Course Name: ").append(name).append("\n");
-        sb.append("Description: ").append(description).append("\n");
-        sb.append("Credits: ").append(credits).append("\n");
-        sb.append("Schedule: ").append(String.join(", ", daysOfWeek)).append("\n");
-        sb.append("Time: ").append(startTime.format(timeFormatter)).append(" - ").append(endTime.format(timeFormatter)).append("\n");
-        sb.append("Category Weights:\n");
-
-        for (String category : categoryWeights.keySet()) {
-            sb.append("  ").append(category).append(": ").append(categoryWeights.get(category)).append("\n");
-        }
-
-        return sb.toString();
+    public Course(Course other) {
+        this.name = other.name;
+        this.code = other.code;
+        this.description = other.description;
+        this.instructor = new Instructor(other.instructor);
+        this.daysOfWeek = new ArrayList<Days>(other.daysOfWeek);
+        //this.studentList = new StudentList(other.studentList);
+        //this.assignments = new CourseAssignments(other.assignments);
     }
 
-    public JPanel createEventPanel() {
-        // Calculate duration in minutes
-        long duration = Duration.between(startTime, endTime).toMinutes();
-        // Set panel height based on duration
-        int panelHeight = (int) duration * 2; // For example, 2 pixels per minute
-        JPanel panel = new JPanel();
-        panel.setPreferredSize(new Dimension(200, panelHeight));
-        panel.setBackground(Color.BLUE);
-        panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-
-        // Add label for course name
-        JLabel label = new JLabel(name);
-        label.setForeground(Color.WHITE);
-        panel.add(label);
-
-        return panel;
+    public CourseAssignments getAssignments() {
+        return assignments;
     }
+    
+    public ArrayList<Student> getStudents() {
+        return studentList;
+    }
+
+    public void addStudent(Student student) {
+    	this.studentList.add(student);
+    }
+    
+    public void removeStudent(Student student) {
+    	this.studentList.remove(student);
+    }
+    
+    public void addAssignment(Assignment assignment) {
+    	this.assignments.addAssignment(assignment);
+    }
+    
+    public void removeAssignment(Assignment assignment) {
+    	this.assignments.removeAssignment(assignment);
+    }
+    
+    public void addDays(ArrayList<Days> daysOfWeek) {
+    	this.daysOfWeek = daysOfWeek;
+    }
+
     public String getName() {
         return name;
     }
-    public LocalTime getStartTime() {
-        return startTime;
+
+    public String getCode() {
+        return code;
     }
-    public LocalTime getEndTime() {
-        return endTime;
+
+    public String getDescription() {
+        return description;
     }
-    public long getDuration() {
-        return Duration.between(startTime, endTime).toMinutes();
+
+    public Instructor getInstructor() {
+        return instructor;
+    }
+
+    public ArrayList<Days> getDaysOfWeek() {
+        return daysOfWeek;
     }
 }
