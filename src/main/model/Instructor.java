@@ -7,10 +7,18 @@ import java.util.HashMap;
 public class Instructor extends User {
     private ArrayList<Course> coursesManaged;
     private String courseTest;
-    
-    public Instructor(String username, String password, String name, boolean isHashed) {
-        super(username, password, name, isHashed);
-        this.coursesManaged = new ArrayList<Course>();
+
+    //String username, String password, String firstName, String lastName, String email, boolean isHashed
+    public Instructor(String username, String password, String firstname, String lastname, String email, boolean isHashed) {
+        super(username, password, firstname, lastname, email, isHashed);
+    }
+
+    public Instructor(Instructor other) {
+        super(other.username, other.password, other.firstname, other.lastname, other.email, true);
+    }
+
+    public String toString() {
+        return "Instructor " + this.firstname + " " + this.lastname + " with username " + username;
     }
 
     public void setCourse(String courseTest) {

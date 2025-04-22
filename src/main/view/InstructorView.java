@@ -5,18 +5,16 @@ import main.model.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 
-public class InstructorApplication extends JFrame {
+//TODO: this class needs to sue a controller, also needs to be split up into smaller classes
+public class InstructorView extends JFrame {
     private Instructor currentInstructor;
     private ArrayList<Course> courses;
     private ArrayList<Student> allStudents;
     private JTabbedPane tabbedPane;
 
-    public InstructorApplication(Instructor instructor) {
+    public InstructorView(Instructor instructor) {
         this.currentInstructor = instructor;
         this.courses = new ArrayList<>();
         this.allStudents = new ArrayList<>();
@@ -24,7 +22,7 @@ public class InstructorApplication extends JFrame {
         // Initialize some sample students (in the real app, these would come from a database or from the read csv file)
         initializeSampleStudents();
         
-        setTitle("Instructor Dashboard - " + instructor.getName());
+        setTitle("Instructor Dashboard - " + instructor.getUsername());
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -41,10 +39,10 @@ public class InstructorApplication extends JFrame {
     
     // just the default students that are there, would be to see how to add
     private void initializeSampleStudents() {
-        allStudents.add(new Student("student1", "pass1", "marvin beak", false));
-        allStudents.add(new Student("student2", "pass2", "tim cheese", false));
-        allStudents.add(new Student("student3", "pass3", "john pork", false));
-        allStudents.add(new Student("student4", "pass4", "agent 5.5", false));
+        allStudents.add(new Student("student1", "pass1", "a", "a", "marvin beak", false));
+        allStudents.add(new Student("student2", "pass2", "a", "a","tim cheese", false));
+        allStudents.add(new Student("student3", "pass3", "a", "a","john pork", false));
+        allStudents.add(new Student("student4", "pass4", "a", "a","agent 5.5", false));
     }
     
     private void createCoursesTab() {
@@ -339,7 +337,7 @@ public class InstructorApplication extends JFrame {
 
         sb.append("Students:\n");
         for (Student student : course.getStudents()) {
-            sb.append("- ").append(student.getName()).append("\n");
+            sb.append("- ").append(student.getUsername()).append("\n");
         }
 
         sb.append("\nAssignments:\n");
@@ -368,8 +366,8 @@ public class InstructorApplication extends JFrame {
     public static void main(String[] args) {
 
         //Instructor instructor = new Instructor("instructor1", "pass123", "Dr. Smith", false);
-    	Instructor instructor = new Instructor("instructor1", "pass123", "Dr. Smith", false);
+    	Instructor instructor = new Instructor("instructor1", "pass123", "a","a", "Dr. Smith", false);
         
-        SwingUtilities.invokeLater(() -> new InstructorApplication(instructor));
+        SwingUtilities.invokeLater(() -> new InstructorView(instructor));
     }
 }
