@@ -45,7 +45,7 @@ public class AddClassPanel extends JPanel {
         // Credits
         
         formPanel.add(new JLabel("Credits:"));
-        creditsField = new JTextField();
+        creditsField = new NumberField();
         formPanel.add(creditsField);
         
         // Description
