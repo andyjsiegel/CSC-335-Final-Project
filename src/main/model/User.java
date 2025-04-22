@@ -50,7 +50,7 @@ public abstract class User {
         return password;
     }
 
-    public String getfirstName() {
+    public String getFirstName() {
         return firstName;
     }
 
