@@ -20,13 +20,17 @@ public class Instructor extends User {
         this.coursesManaged.add(course);
     }
 
+//    public ArrayList<Course> getCoursesManaged() {
+//        ArrayList<Course> copy = new ArrayList<Course>();
+//        for (Course course : this.coursesManaged) {
+//            copy.add(new Course(course));
+//        }
+//        return copy;
+//    }
     public ArrayList<Course> getCoursesManaged() {
-        ArrayList<Course> copy = new ArrayList<Course>();
-        for (Course course : this.coursesManaged) {
-            copy.add(new Course(course));
-        }
-        return copy;
+        return this.coursesManaged;
     }
+
 
     public ArrayList<String> getFullName() {
         ArrayList<String> name = new ArrayList<String>();
@@ -37,5 +41,20 @@ public class Instructor extends User {
 
     public String toString() {
         return "Instructor " + this.firstname + " " + this.lastname + " with username " + username;
+    }
+
+    public ArrayList<Course> getCoursesForDay(Days day) {
+        ArrayList<Course> courses = new ArrayList<Course>();
+        for (Course course : this.coursesManaged) {
+        	System.out.println("Cuorse Managed: " + course.getName());
+        	for (Days dayss : course.getDays()) {
+        		System.out.println("this should work i guess:" + dayss);
+        	}
+            if (course.getDays().contains(day)) {
+                courses.add(course);
+            }
+        }
+        return courses;
+        
     }
 }
