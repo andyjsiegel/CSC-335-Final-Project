@@ -104,23 +104,30 @@ public class LoginScreen extends JFrame {
         setVisible(true);
     }
 
+    // Invalid login credentials
+    // Called by the controller to update message label
     public void updateMessageLabel(String message, boolean success) {
         messageLabel.setForeground(success ? new Color(0, 128, 0) : Color.RED);
         messageLabel.setText(message);
     }
 
+    // Called by the controller to navigate to the instructor view
     public void navigateToInstructorView(Instructor instructor) {
         updateMessageLabel("Login successful!", true);
         new InstructorView(instructor);
         this.dispose();
     }
 
+    // Called by the controller to navigate to the student view
     public void navigateToStudentView(Student student) {
         updateMessageLabel("Login successful!", true);
         //new StudentView(student);
         this.dispose();
     }
 
+
+    // Instructor login: Username:pelier, Password:pass
+    // Student login: Username:pelier1, Password:pass
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new LoginScreen());
     }
