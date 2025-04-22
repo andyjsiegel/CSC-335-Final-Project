@@ -8,7 +8,7 @@ public class Assignment {
     private String name;
     private String description;
     
-    private String category;
+    private String category; //TODO: should be removed because assignment stored within a Category object.
     private String title;
     private double points;
     private double maxPoints;
@@ -23,7 +23,7 @@ public class Assignment {
         this.category = category;
         this.title = title;
         this.maxPoints = maxPoints;
-        this.points = -1; // -1 means not graded. 
+        this.points = -1; // <0 score means not graded. 
     }
     
     public String getTitle() {
