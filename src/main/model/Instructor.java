@@ -46,10 +46,6 @@ public class Instructor extends User {
     public ArrayList<Course> getCoursesForDay(Days day) {
         ArrayList<Course> courses = new ArrayList<Course>();
         for (Course course : this.coursesManaged) {
-        	System.out.println("Cuorse Managed: " + course.getName());
-        	for (Days dayss : course.getDays()) {
-        		System.out.println("this should work i guess:" + dayss);
-        	}
             if (course.getDays().contains(day)) {
                 courses.add(course);
             }
