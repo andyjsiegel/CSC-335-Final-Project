@@ -6,13 +6,13 @@ public class Instructor extends User {
     private ArrayList<Course> coursesManaged;
 
     //String username, String password, String firstName, String lastName, String email, boolean isHashed
-    public Instructor(String username, String password, String firstname, String lastname, String email, boolean isHashed) {
-        super(username, password, firstname, lastname, email, isHashed);
+    public Instructor(String username, String password, String firstName, String lastName, String email, boolean isHashed) {
+        super(username, password, firstName, lastName, email, isHashed);
         coursesManaged = new ArrayList<Course>();
     }
 
     public Instructor(Instructor other) {
-        super(other.username, other.password, other.firstname, other.lastname, other.email, true);
+        super(other.username, other.password, other.firstName, other.lastName, other.email, true);
         this.coursesManaged = new ArrayList<Course>(other.coursesManaged);
     }
     
@@ -34,13 +34,13 @@ public class Instructor extends User {
 
     public ArrayList<String> getFullName() {
         ArrayList<String> name = new ArrayList<String>();
-    	name.add(this.firstname);
-        name.add(this.lastname);
+    	name.add(this.firstName);
+        name.add(this.lastName);
         return name;
     }
 
     public String toString() {
-        return "Instructor " + this.firstname + " " + this.lastname + " with username " + username;
+        return "Instructor " + this.firstName + " " + this.lastName + " with username " + username;
     }
 
     public ArrayList<Course> getCoursesForDay(Days day) {

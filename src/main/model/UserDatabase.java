@@ -37,7 +37,7 @@ public class UserDatabase {
 
     public void addUser(User user) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
-            writer.write(user.getUsername() + "," + user.getHashedPassword() + "," + user.getFirstname() + "," + user.getLastname() + "," + user.getEmail() + "," + user.getClass().getSimpleName() + "\n");
+            writer.write(user.getUsername() + "," + user.getHashedPassword() + "," + user.getFirstName() + "," + user.getLastName() + "," + user.getEmail() + "," + user.getClass().getSimpleName() + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
