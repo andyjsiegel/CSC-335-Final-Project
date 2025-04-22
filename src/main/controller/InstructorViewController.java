@@ -17,10 +17,10 @@ public class InstructorViewController {
         this.instructor = instructor;
     }
 
-    public void addCourse(String className, String classCode, String classDescription, List<String> selectedDays) {
+    public void addCourse(String className, String classCode, String credits, String classDescription, List<String> selectedDays) {
         ArrayList<Days> dayList = new ArrayList<>();
         for (String day : selectedDays) {
-            if (day.equals("Mon")) {
+            if (day.equalsIgnoreCase("Mon")) {
                 dayList.add(Days.MONDAY);
             } else if (day.equals("Tue")) {
                 dayList.add(Days.TUESDAY);
@@ -33,12 +33,16 @@ public class InstructorViewController {
             }
         }
 
-        Course course = new Course(className, classCode, classDescription, this.instructor, dayList);
+        Course course = new Course(className, classCode, credits, classDescription, this.instructor, dayList);
         gradebook.addCourse(course);
         instructor.addCourse(course);
     }
 
     public ArrayList<Course> getInstructorCourses() {
         return instructor.getCoursesManaged();
+    }
+    
+    public Instructor getInstructor() {
+    	return this.instructor;
     }
 }
