@@ -47,6 +47,7 @@ public class ListViewClassesPanel extends JPanel {
         descriptionArea.setLineWrap(true);
         descriptionArea.setWrapStyleWord(true);
         descriptionArea.setEditable(false);
+        descriptionArea.setFocusable(false);
         descriptionArea.setBackground(panel.getBackground());
     
         JPanel top = new JPanel(new GridLayout(3, 1));
