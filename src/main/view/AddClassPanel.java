@@ -3,6 +3,7 @@ package main.view;
 import javax.swing.*;
 
 import main.controller.InstructorViewController;
+import main.model.Days;
 import main.model.Instructor;
 
 import java.awt.*;
@@ -15,6 +16,7 @@ public class AddClassPanel extends JPanel {
     private InstructorViewController controller;
 
     private JTextField classNameField;
+    private JTextField creditsField;
     private JTextField classCodeField;
     private JTextArea descriptionArea;
     private JCheckBox[] dayCheckboxes;
@@ -22,7 +24,8 @@ public class AddClassPanel extends JPanel {
 
     public AddClassPanel(Instructor instructor, InstructorViewController controller) {
         this.instructor = instructor;
-        this.controller = new InstructorViewController(instructor); 
+        this.controller = controller; // Use the one passed in
+
 
         setLayout(new BorderLayout());
 
@@ -39,6 +42,12 @@ public class AddClassPanel extends JPanel {
         classCodeField = new JTextField();
         formPanel.add(classCodeField);
 
+        // Credits
+        
+        formPanel.add(new JLabel("Credits:"));
+        creditsField = new JTextField();
+        formPanel.add(creditsField);
+        
         // Description
         formPanel.add(new JLabel("Description:"));
         descriptionArea = new JTextArea(3, 20);
@@ -69,18 +78,28 @@ public class AddClassPanel extends JPanel {
         String className = classNameField.getText();
         String classCode = classCodeField.getText();
         String description = descriptionArea.getText();
-        List<String> selectedDays = new ArrayList<>();
+        String credits = creditsField.getText();
+
+        ArrayList<String> selectedDays = new ArrayList<>();
 
         for (JCheckBox checkbox : dayCheckboxes) {
             if (checkbox.isSelected()) {
-                selectedDays.add(checkbox.getText());
+                try {
+                    //Days dayEnum = Days.valueOf(checkbox.getText().toUpperCase()); // turn "Mon" into "MONDAY"
+                    String day = checkbox.getText();
+                    //System.out.println("Selected ->" + day);
+                	selectedDays.add(day);
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Invalid day: " + checkbox.getText());
+                }
             }
         }
 
-        controller.addCourse(className, classCode, description, selectedDays);
+        controller.addCourse(className, classCode, credits, description, selectedDays);
 
         System.out.println("Class Name: " + className);
         System.out.println("Description: " + description);
         System.out.println("Days: " + selectedDays);
     }
+
 }

@@ -8,12 +8,12 @@ import java.awt.*;
 
 //TODO: this class needs to sue a controller, also needs to be split up into smaller classes
 public class InstructorView extends JFrame {
-    private Instructor instructor;
+    //private Instructor instructor;
     protected InstructorViewController controller;
     protected JPanel mainPanel;
 
     public InstructorView(Instructor instructor) {
-        this.instructor = instructor;
+        //this.instructor = instructor;
         this.controller = new InstructorViewController(instructor);
 
         setupWindow();
@@ -74,7 +74,7 @@ public class InstructorView extends JFrame {
 
     private void showAddClassPanel() {
         mainPanel.removeAll();
-        mainPanel.add(new AddClassPanel(this.instructor, controller), BorderLayout.CENTER);
+        mainPanel.add(new AddClassPanel(controller.getInstructor(), controller), BorderLayout.CENTER);
         mainPanel.revalidate();
         mainPanel.repaint();
     }
@@ -88,10 +88,19 @@ public class InstructorView extends JFrame {
         mainPanel.repaint();
     }
 
+//    private void showCalendarPanel() {
+//        mainPanel.removeAll();
+//       
+//          //  CalendarView calendarView = new CalendarView(currentInstructor);
+//            //calendarView.setVisible(true);
+//
+//        mainPanel.add(new CalendarView(instructor));
+//       //mainPanel.add(new JLabel("Calendar Panel"), BorderLayout.CENTER);
+//        mainPanel.revalidate();
+//        mainPanel.repaint();
+//    }
+//    
     private void showCalendarPanel() {
-        mainPanel.removeAll();
-        mainPanel.add(new JLabel("Calendar Panel"), BorderLayout.CENTER);
-        mainPanel.revalidate();
-        mainPanel.repaint();
+        new CalendarView(controller.getInstructor());
     }
 }
