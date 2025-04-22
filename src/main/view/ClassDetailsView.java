@@ -3,6 +3,7 @@ package main.view;
 import main.controller.InstructorViewController;
 import main.model.Course;
 import main.model.Student;
+import main.model.StudentList;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,7 +31,7 @@ public class ClassDetailsView extends JFrame {
         JPanel studentPanel = new JPanel();
         studentPanel.setLayout(new BoxLayout(studentPanel, BoxLayout.Y_AXIS));
 
-        List<Student> students = course.getStudents(); // assuming this exists
+        StudentList students = course.getStudents(); // assuming this exists
 
         if (students == null || students.isEmpty()) {
             studentPanel.add(new JLabel("No students enrolled."));
