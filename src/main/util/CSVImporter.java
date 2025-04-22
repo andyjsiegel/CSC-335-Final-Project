@@ -18,12 +18,15 @@ public class CSVImporter {
                 if (tokens.length >= 4) {
                     String username = tokens[0].trim();
                     String password = tokens[1].trim();
-                    String name = tokens[2].trim();
-                    String role = tokens[3].trim();
+                    String firstName = tokens[2].trim();
+                    String lastName = tokens[3].trim();
+                    String email = tokens[4].trim();
+                    String role = tokens[5].trim();
                     // Only create a Student if the role matches.
                     if (role.equalsIgnoreCase("Student")) {
-                        // The Student constructor expects a boolean for whether the password is hashed.
-                        Student student = new Student(username, password, name, false);
+                        // The Student constructor expects a boolean for whether the password is hashed. 
+                        // Because we are pulling from csv with hashedPasswords, set bool to true.
+                        Student student = new Student(username, password, firstName, lastName, email, true);
                         students.add(student);
                     }
                 }
