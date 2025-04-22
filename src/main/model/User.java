@@ -9,15 +9,15 @@ public abstract class User {
     protected String username;
     protected String password;
     protected String email;
-    protected String firstname;
-    protected String lastname;
+    protected String firstName;
+    protected String lastName;
 
     public User(String username, String password, String firstName, String lastName, String email, boolean isHashed) {
         this.username = username;
         if(isHashed) this.password = password;
         else this.password = hashPassword(password);
-        this.firstname = firstName;
-        this.lastname = lastName;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
     }
 
@@ -50,12 +50,12 @@ public abstract class User {
         return password;
     }
 
-    public String getFirstname() {
-        return firstname;
+    public String getfirstName() {
+        return firstName;
     }
 
-    public String getLastname() {
-        return lastname;
+    public String getLastName() {
+        return lastName;
     }
 
     public String getEmail() {

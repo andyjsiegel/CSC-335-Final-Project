@@ -8,20 +8,20 @@ public class Student extends User {
     private ArrayList<Course> coursesTaken;
     private StudentGradebook gradebook;
     
-    public Student(String username, String password, String firstname, String lastname, String email, boolean isHashed) {
-        super(username, password, firstname, lastname, email, isHashed);
+    public Student(String username, String password, String firstName, String lastName, String email, boolean isHashed) {
+        super(username, password, firstName, lastName, email, isHashed);
     }
 
 	//copy constructor
     public Student(Student other) {
-        super(other.username, other.password, other.firstname, other.lastname, other.email,true);
+        super(other.username, other.password, other.firstName, other.lastName, other.email,true);
         this.gradebook = new StudentGradebook();
     }
 
 	public static Comparator<Student> sortByFirstName() {
 		return new Comparator<Student>() {
 			public int compare(Student s1, Student s2) {
-				int nameCompare = s1.firstname.compareToIgnoreCase(s2.firstname);
+				int nameCompare = s1.firstName.compareToIgnoreCase(s2.firstName);
 				return nameCompare;
 			}
 		};
@@ -37,12 +37,12 @@ public class Student extends User {
 	}
 
 	public String getFullName() {
-		return this.firstname + " " + this.lastname;
+		return this.firstName + " " + this.lastName;
 	}
 
 	@Override
 	public String toString() {
-		return "Student " + this.firstname + " " + this.lastname + " with username " + username;
+		return "Student " + this.firstName + " " + this.lastName + " with username " + username;
 	}
     
 	public ArrayList<Course> getCoursesForDay(Days day) {
