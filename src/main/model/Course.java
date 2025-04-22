@@ -198,8 +198,8 @@ public class Course {
             int pointsPossible = categories.get(category).getPoints();
             for (Assignment assignment : assignments) {
                 //assignment.setGradeTo100();
-                if(assignment.getPointsEarned() != null) {
-                    pointsEarned += assignment.getPointsEarned();
+                if(assignment.getGrade() >= 0) {
+                    pointsEarned += assignment.getGrade();
                     numGraded++;
                 }
                 JLabel assignmentLabel = new JLabel(assignment.getTitle() + " : " + assignment.getGrade());
