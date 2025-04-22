@@ -34,6 +34,7 @@ public class InstructorViewController {
         }
 
         Course course = new Course(className, classCode, credits, classDescription, this.instructor, dayList);
+        course.setDefaultCategories();
         gradebook.addCourse(course);
         instructor.addCourse(course);
     }
