@@ -32,11 +32,8 @@ public class Instructor extends User {
     }
 
 
-    public ArrayList<String> getFullName() {
-        ArrayList<String> name = new ArrayList<String>();
-    	name.add(this.firstName);
-        name.add(this.lastName);
-        return name;
+    public String getFullName() {
+       return firstName + " " + lastName;
     }
 
     public String toString() {
