@@ -61,5 +61,8 @@ public abstract class User {
     public String getEmail() {
         return email;
     }
+    
+    public abstract ArrayList<Course> getCourses();
+
     public abstract ArrayList<Course> getCoursesForDay(Days day);
 }
