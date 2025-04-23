@@ -30,6 +30,10 @@ public class StudentList implements Iterable<Student> {
 	public void remove(Student student) {
 		internalStudentList.remove(student);
 	}
+
+	public Student get(int index) {
+		return internalStudentList.get(index);
+	}
 	
 	
     public void sortByFirstName() {
