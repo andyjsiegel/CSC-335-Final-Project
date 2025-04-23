@@ -4,11 +4,9 @@ import java.util.Date;
 
 public class Assignment {
     private Date dueDate;
-
-    private String name;
+    private String title;
     private String description;
 
-    private String title;
     private double points;
     private double maxPoints;
     
@@ -26,21 +24,16 @@ public class Assignment {
     }
     
     public String getTitle() {
-    	return name;
+    	return title;
     }
-    
-    public String getName() {
-    	return name;
-    }
-    public void setAssignmentName(String name) {
-    	this.name = name;
-    }
-    
     
     public void setAssignmentDescription(String description) {
     	this.description = description;
     }
     
+    public void setGradeTo100() {
+        this.points = this.maxPoints;
+    }
  
     public void setGrade(Double grade) {
     	this.points = grade;
@@ -63,6 +56,6 @@ public class Assignment {
             return false;
         }
         Assignment other = (Assignment) obj;
-        return name.equals(other.name) && dueDate.equals(other.dueDate) && points == other.points; 
+        return title.equals(other.title) && dueDate.equals(other.dueDate) && points == other.points; 
     }
 }

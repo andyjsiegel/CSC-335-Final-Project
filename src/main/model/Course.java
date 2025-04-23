@@ -3,6 +3,7 @@ package main.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Arrays;
 
 import javax.swing.*;
 import java.awt.*;
@@ -48,12 +49,29 @@ public class Course {
         //this.assignments = new CourseAssignments(other.assignments);
     }
 
+    public void addAllStudentsFromPool() {
+        // constructor pulls from users.csv
+        for(User user : new UserDatabase()) {
+            if(user instanceof Student) {
+                this.studentList.add((Student) user);
+            }
+        }
+    }
+
     public void setDefaultCategories() {
         // new Category(name, points, expPointsPerAssignment)
-        categories.put("Homeworks", new Category("Homeworks", 250, 25));
-        categories.put("Projects", new Category("Projects", 250, 50));
-        categories.put("Midterm Exam", new Category("Midterm Exam", 250, 250));
-        categories.put("Final Exam", new Category("Final Exam", 250, 250));
+        Category homeworks = new Category("Homeworks", 250, 25);
+        homeworks.addDefaultAssignments();
+        categories.put("Homeworks", homeworks);
+        Category projects = new Category("Projects", 250, 50);
+        projects.addDefaultAssignments();
+        categories.put("Projects", projects);
+        Category midtermExam = new Category("Midterm Exam", 250, 250);
+        midtermExam.addDefaultAssignments();
+        categories.put("Midterm Exam", midtermExam);
+        Category finalExam = new Category("Final Exam", 250, 250);
+        finalExam.addDefaultAssignments();
+        categories.put("Final Exam", finalExam);
     }
 
     public CourseAssignments getAssignments() {
@@ -269,12 +287,12 @@ public class Course {
             int pointsEarned = 0;
             int pointsPossible = categories.get(category).getPoints();
             for (Assignment assignment : assignments) {
-                //assignment.setGradeTo100();
+                // assignment.setGradeTo100();
                 if(assignment.getGrade() >= 0) {
                     pointsEarned += assignment.getGrade();
                     numGraded++;
                 }
-                JLabel assignmentLabel = new JLabel(assignment.getTitle() + " : " + assignment.getGrade());
+                JLabel assignmentLabel = new JLabel(assignment.getTitle() + " : " + (assignment.getGrade() >= 0 ? assignment.getGrade() + "/" + assignment.getMaxPoints() : "--/" + assignment.getMaxPoints()));
                 assignmentLabel.setBorder(BorderFactory.createEmptyBorder(2, 20, 2, 2));
                 assignmentsListPanel.add(assignmentLabel);
             }
@@ -297,12 +315,13 @@ public class Course {
         }
 
         JPanel classListPanel = new JPanel();
-        classListPanel.setLayout(new BoxLayout(classListPanel, BoxLayout.Y_AXIS));
         if(studentList.isEmpty()) {
             classListPanel.add(new JLabel("No students enrolled."));
         }
+        classListPanel.setLayout(new GridLayout(studentList.size(), 2));
         for(Student student : studentList) {
             classListPanel.add(new JLabel(student.getFirstName() + " " + student.getLastName()));
+            classListPanel.add(new JCheckBox());
         }
 
         // Wrap assignmentsPanel in a JScrollPane in case of many assignments/categories

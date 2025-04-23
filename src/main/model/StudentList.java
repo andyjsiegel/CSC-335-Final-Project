@@ -1,6 +1,9 @@
 package main.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Collections;
 
 
 public class StudentList implements Iterable<Student> {
@@ -41,6 +44,18 @@ public class StudentList implements Iterable<Student> {
 	
 	public boolean isEmpty() {
 		return this.internalStudentList.isEmpty();
+	}
+
+	public int size() {
+		return this.internalStudentList.size();
+	}
+
+	public void merge(StudentList other) {
+		this.internalStudentList.addAll(other.internalStudentList);
+		HashSet<Student> uniqueStudents = new HashSet<>();
+		uniqueStudents.addAll(this.internalStudentList);
+		this.internalStudentList.clear();
+		this.internalStudentList.addAll(uniqueStudents);
 	}
 	
 	

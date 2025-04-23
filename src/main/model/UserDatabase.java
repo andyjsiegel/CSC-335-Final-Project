@@ -5,18 +5,24 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.io.BufferedWriter;
 import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.FileReader;
 
-public class UserDatabase {
+public class UserDatabase implements Iterable<User> {
     private String filePath;
     private HashMap<String, User> users = new HashMap<>();
     
     // Default constructor with default file path
     public UserDatabase() {
         this("src/main/controller/users.csv");
+    }
+
+    @Override
+    public Iterator<User> iterator() {
+        return users.values().iterator();
     }
 
     // Constructor with custom file path
@@ -67,7 +73,7 @@ public class UserDatabase {
                     String lastname = userInfo[3];
                     String email = userInfo[4];
                     String role = userInfo[5];
-
+                    
                     // Create a User object based on the role
                     User user;
                     if (role.equalsIgnoreCase("Student")) {
@@ -78,7 +84,7 @@ public class UserDatabase {
                         System.err.println("Unknown role: " + role);
                         continue; // Skip unknown roles
                     }
-
+                    
                     users.put(username, user);
                 } else {
                     System.err.println("Invalid user data: " + line);
