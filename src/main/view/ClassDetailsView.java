@@ -1,6 +1,6 @@
 package main.view;
 
-import main.controller.InstructorViewController;
+import main.controller.UserViewController;
 import main.model.Course;
 import main.model.Student;
 import main.model.StudentList;
@@ -11,7 +11,7 @@ import java.util.List;
 
 public class ClassDetailsView extends JFrame {
 
-    public ClassDetailsView(Course course, InstructorViewController controller) {
+    public ClassDetailsView(Course course, UserViewController controller) {
         setTitle("Class Details - " + course.getName());
         setSize(500, 400);
         setLocationRelativeTo(null);
@@ -21,7 +21,7 @@ public class ClassDetailsView extends JFrame {
         // Course Info Section
         JPanel topPanel = new JPanel(new GridLayout(4, 1));
         topPanel.add(new JLabel("Name: " + course.getName()));
-        topPanel.add(new JLabel("Code: " + course.getCode()));
+        topPanel.add(new JLabel("Code: " + course.getCourseCode()));
         topPanel.add(new JLabel("Instructor: " + course.getInstructor().getFullName()));
         //topPanel.add(new JLabel("Days: " + String.join(", ", course.getDaysOfWeek())));
 
