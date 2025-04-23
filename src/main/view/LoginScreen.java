@@ -119,13 +119,14 @@ public class LoginScreen extends JFrame {
     // Called by the controller to navigate to the instructor view
     public void navigateToInstructorView(Instructor instructor) {
         updateMessageLabel("Login successful!", true);
-        new InstructorView(instructor);
+        new MainView(instructor);
         this.dispose();
     }
 
     // Called by the controller to navigate to the student view
     public void navigateToStudentView(Student student) {
         updateMessageLabel("Login successful!", true);
+        new MainView(student);
         //new StudentView(student);
         this.dispose();
     }
