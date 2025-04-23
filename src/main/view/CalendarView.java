@@ -80,6 +80,7 @@ public class CalendarView extends JFrame {
             //System.out.println("Checking "  + " | Days=" + day + user.getCoursesForDay(day));
             
             for (Course course : user.getCoursesForDay(day)) {
+                boolean isInstructor = user instanceof Instructor;
             	//System.out.println("Checking " + day + ": " + course.getName() + " | Days=" + course.getDays());
 
                 // Only add if we haven't displayed this course yet
@@ -87,7 +88,7 @@ public class CalendarView extends JFrame {
                     JButton classLabel = new JButton(course.getName());
                     classLabel.setText("<html><center>"+course.getName()+"<br>("+course.getCourseCode()+")</center></html>");
                     classLabel.addActionListener(e -> {
-                    	 JOptionPane.showMessageDialog(null, course.getCourseView(), course.getCode(), JOptionPane.PLAIN_MESSAGE);
+                    	 JOptionPane.showMessageDialog(null, course.getCourseView(isInstructor), course.getCode(), JOptionPane.PLAIN_MESSAGE);
                     });
                     
                     dayPanel.add(classLabel);
