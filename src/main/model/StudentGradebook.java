@@ -14,11 +14,13 @@ public class StudentGradebook {
 	private int assignmentCount;
 	private double classAverage;
 	private double median;
+	private String courseTitle;
 	private ArrayList<Assignment> courseAssignments;
 	private FinalGrades finalGrade;
 	
-	public StudentGradebook() {
+	public StudentGradebook(String courseTitle) {
 		this.courseAssignments = new ArrayList<>();
+		this.courseTitle = courseTitle;
 	}
 	
 	// must pass a copy of Assignments to this first btw 
