@@ -23,7 +23,7 @@ public class CSVImporter {
                     // Only create a Student if the role matches.
                     if (role.equalsIgnoreCase("Student")) {
                         // The Student constructor expects a boolean for whether the password is hashed.
-                        Student student = new Student(username, password, name, false);
+                        Student student = new Student(username, password, name, role, role, false);
                         students.add(student);
                     }
                 }

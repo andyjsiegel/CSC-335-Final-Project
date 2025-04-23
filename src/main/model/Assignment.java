@@ -33,6 +33,7 @@ public class Assignment {
     public String getName() {
     	return name;
     }
+    
     public void setAssignmentName(String name) {
     	this.name = name;
     }

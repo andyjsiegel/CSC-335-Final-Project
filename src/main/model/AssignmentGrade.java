@@ -36,4 +36,5 @@ public class AssignmentGrade {
         if (pointsPossible == 0) return 0;
         return pointsEarned / pointsPossible;
     }
+    
 }

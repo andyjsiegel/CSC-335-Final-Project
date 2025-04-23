@@ -41,4 +41,6 @@ public class InstructorViewController {
     public ArrayList<Course> getInstructorCourses() {
         return instructor.getCoursesManaged();
     }
+    
+    
 }

@@ -32,7 +32,7 @@ public class CalendarView extends JFrame{
 
     private void updateCalendar() {
         StringBuilder calendarContent = new StringBuilder();
-        List<Course> courses = instructor.getCourses(); // Assuming getCourses() method exists
+        List<Course> courses = instructor.getCoursesManaged(); // Assuming getCourses() method exists
 
         for (Course course : courses) {
             calendarContent.append("Course: ").append(course.getName()).append("\n");
