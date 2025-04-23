@@ -18,6 +18,10 @@ public class Student extends User {
         this.gradebook = new StudentGradebook();
     }
 
+	public StudentGradebook getGradebook() {
+		return gradebook;
+	}
+
 	public static Comparator<Student> sortByFirstName() {
 		return new Comparator<Student>() {
 			public int compare(Student s1, Student s2) {
