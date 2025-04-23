@@ -10,7 +10,7 @@ import main.view.LoginScreen;
 public class LoginController {
 
     private final LoginScreen ls;
-    private UserDatabase userDatabase = new UserDatabase();
+    private UserDatabase userDatabase = UserDatabase.getInstance();
 
     public LoginController(LoginScreen ls) {
         this.ls = ls;
