@@ -181,7 +181,7 @@ public class Course {
         return panel;
     }
     
-    public JTabbedPane getCourseView() {
+    public JTabbedPane getCourseView(boolean isInstructor) {
         // Main panel with course details
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
@@ -264,6 +264,8 @@ public class Course {
             JOptionPane.showMessageDialog(null, this.getAssignmentAddPanel(), this.getCode(), JOptionPane.PLAIN_MESSAGE);
         });
         assignmentsPanel.add(addAssignmentButton);
+        // keep a list of JCheckboxes in order
+        ArrayList<JCheckBox> studentCheckboxes = new ArrayList<JCheckBox>();
 
         ArrayList<String> categoryTitles = new ArrayList<String>(categories.keySet());
         Collections.sort(categoryTitles);
@@ -295,6 +297,20 @@ public class Course {
                 JLabel assignmentLabel = new JLabel(assignment.getTitle() + " : " + (assignment.getGrade() >= 0 ? assignment.getGrade() + "/" + assignment.getMaxPoints() : "--/" + assignment.getMaxPoints()));
                 assignmentLabel.setBorder(BorderFactory.createEmptyBorder(2, 20, 2, 2));
                 assignmentsListPanel.add(assignmentLabel);
+                JButton gradeAssignmentButton = new JButton("Grade");
+                gradeAssignmentButton.addActionListener(_ -> {
+                    String grade = JOptionPane.showInputDialog("How many points did the selected users get?"); 
+                    double gradeEarned = Double.parseDouble(grade);
+                    for(int i = 0; i < studentCheckboxes.size(); i++) {
+                        JCheckBox checkbox = studentCheckboxes.get(i);
+                        if(checkbox.isSelected()) {
+                            Student student = this.getStudents().get(i);
+                            student.getGradebook().addAssignment(assignment, gradeEarned);
+                        }
+                    }
+                    // this.getStudents().get();  
+                });
+                assignmentsListPanel.add(gradeAssignmentButton);
             }
             
             assignmentsGraded.setText(numGraded + "/" + assignments.size() + " " + category + " graded: " + pointsEarned + "/" + pointsPossible + " points earned");
@@ -321,7 +337,11 @@ public class Course {
         classListPanel.setLayout(new GridLayout(studentList.size(), 2));
         for(Student student : studentList) {
             classListPanel.add(new JLabel(student.getFirstName() + " " + student.getLastName()));
-            classListPanel.add(new JCheckBox());
+            if(isInstructor) {
+                JCheckBox checkbox = new JCheckBox();
+                studentCheckboxes.add(checkbox);
+                classListPanel.add(checkbox);
+            } 
         }
 
         // Wrap assignmentsPanel in a JScrollPane in case of many assignments/categories
