@@ -6,21 +6,29 @@ import java.util.Comparator;
 public class Student extends User {
 	
     private ArrayList<Course> coursesTaken;
-    private StudentGradebook gradebook;
+    private ArrayList<StudentGradebook> gradebooks;
     
     public Student(String username, String password, String firstName, String lastName, String email, boolean isHashed) {
         super(username, password, firstName, lastName, email, isHashed);
+		coursesTaken = new ArrayList<Course>();
+		gradebooks = new ArrayList<StudentGradebook>();
     }
 
 	//copy constructor
     public Student(Student other) {
         super(other.username, other.password, other.firstName, other.lastName, other.email,true);
-        this.gradebook = new StudentGradebook();
     }
 
-	public StudentGradebook getGradebook() {
-		return gradebook;
+	public StudentGradebook getGradebookForCourse(Course course) {
+		return gradebooks.get(coursesTaken.indexOf(course));
 	}
+
+	public void addCourse(Course course) {
+		System.out.println("Added course " + course.getName() + " to student " + this.firstName + " " + this.lastName);
+		coursesTaken.add(course);
+		gradebooks.add(new StudentGradebook(course.getName()));
+	}
+
 
 	public static Comparator<Student> sortByFirstName() {
 		return new Comparator<Student>() {
@@ -59,6 +67,17 @@ public class Student extends User {
 	}
     
 	public ArrayList<Course> getCoursesForDay(Days day) {
+        ArrayList<Course> courses = new ArrayList<Course>();
+        for (Course course : this.coursesTaken) {
+            if (course.getDays().contains(day)) {
+                courses.add(course);
+            }
+        }
+        return courses;
+        
+    }
+
+	public ArrayList<Course> getCourses() {
 		return coursesTaken;
 	}
 }
