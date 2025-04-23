@@ -67,6 +67,11 @@ public class LoginScreen extends JFrame {
         passwordField.setFont(font);
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.WEST;
+        passwordField.addActionListener(e -> {
+            String username = usernameField.getText();
+            String password = new String(passwordField.getPassword());
+            loginController.login(username, password);
+        });
         add(passwordField, gbc);
 
         // Message label
