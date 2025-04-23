@@ -51,9 +51,11 @@ public class Course {
 
     public void addAllStudentsFromPool() {
         // constructor pulls from users.csv
-        for(User user : new UserDatabase()) {
+        for(User user : UserDatabase.getInstance()) {
             if(user instanceof Student) {
-                this.studentList.add((Student) user);
+                Student student = (Student) user;
+                this.studentList.add(student);
+                student.addCourse(this);
             }
         }
     }
@@ -104,10 +106,6 @@ public class Course {
 
     public String getName() {
         return name;
-    }
-
-    public String getCode() {
-        return code;
     }
 
     public String getCourseCode() {
@@ -261,7 +259,7 @@ public class Course {
         
         JButton addAssignmentButton = new JButton("Add Assignment");
         addAssignmentButton.addActionListener(_ -> {
-            JOptionPane.showMessageDialog(null, this.getAssignmentAddPanel(), this.getCode(), JOptionPane.PLAIN_MESSAGE);
+            JOptionPane.showMessageDialog(null, this.getAssignmentAddPanel(), this.getCourseCode(), JOptionPane.PLAIN_MESSAGE);
         });
         assignmentsPanel.add(addAssignmentButton);
         // keep a list of JCheckboxes in order
@@ -305,7 +303,7 @@ public class Course {
                         JCheckBox checkbox = studentCheckboxes.get(i);
                         if(checkbox.isSelected()) {
                             Student student = this.getStudents().get(i);
-                            student.getGradebook().addAssignment(assignment, gradeEarned);
+                            student.getGradebookForCourse(this).addAssignment(assignment, gradeEarned);
                         }
                     }
                     // this.getStudents().get();  
