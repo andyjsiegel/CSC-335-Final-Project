@@ -27,19 +27,19 @@ public class Instructor extends User {
 //        }
 //        return copy;
 //    }
-    public ArrayList<Course> getCoursesManaged() {
-        return this.coursesManaged;
-    }
 
 
     public String getFullName() {
-       return firstName + " " + lastName;
+        return firstName + " " + lastName;
     }
 
     public String toString() {
         return "Instructor " + this.firstName + " " + this.lastName + " with username " + username;
     }
 
+    public ArrayList<Course> getCourses() {
+        return this.coursesManaged;
+    }
     public ArrayList<Course> getCoursesForDay(Days day) {
         ArrayList<Course> courses = new ArrayList<Course>();
         for (Course course : this.coursesManaged) {
