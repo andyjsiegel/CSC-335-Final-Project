@@ -88,7 +88,7 @@ public class CalendarView extends JFrame {
                     JButton classLabel = new JButton(course.getName());
                     classLabel.setText("<html><center>"+course.getName()+"<br>("+course.getCourseCode()+")</center></html>");
                     classLabel.addActionListener(e -> {
-                    	 JOptionPane.showMessageDialog(null, course.getCourseView(isInstructor), course.getCode(), JOptionPane.PLAIN_MESSAGE);
+                    	 JOptionPane.showMessageDialog(null, course.getCourseView(isInstructor), course.getCourseCode(), JOptionPane.PLAIN_MESSAGE);
                     });
                     
                     dayPanel.add(classLabel);
