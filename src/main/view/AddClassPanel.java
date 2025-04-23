@@ -2,9 +2,9 @@ package main.view;
 
 import javax.swing.*;
 
-import main.controller.InstructorViewController;
+import main.controller.UserViewController;
 import main.model.Days;
-import main.model.Instructor;
+import main.model.User;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -12,8 +12,8 @@ import java.util.List;
 
 public class AddClassPanel extends JPanel {
 
-    private Instructor instructor;
-    private InstructorViewController controller;
+    private User user;
+    private UserViewController controller;
 
     private JTextField classNameField;
     private JTextField creditsField;
@@ -22,8 +22,8 @@ public class AddClassPanel extends JPanel {
     private JCheckBox[] dayCheckboxes;
     private JButton submitButton;
 
-    public AddClassPanel(Instructor instructor, InstructorViewController controller) {
-        this.instructor = instructor;
+    public AddClassPanel(User user, UserViewController controller) {
+        this.user = user;
         this.controller = controller; // Use the one passed in
 
 
