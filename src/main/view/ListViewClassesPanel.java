@@ -1,26 +1,28 @@
 package main.view;
 
-import main.controller.InstructorViewController;
+import main.controller.UserViewController;
 import main.model.Course;
+import main.model.Instructor;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
 public class ListViewClassesPanel extends JPanel {
-    private InstructorViewController controller;
+    private UserViewController controller;
 
-    public ListViewClassesPanel(InstructorViewController controller) {
+    public ListViewClassesPanel(UserViewController controller) {
         this.controller = controller;
         setLayout(new BorderLayout());
 
         JPanel courseListPanel = new JPanel();
         courseListPanel.setLayout(new BoxLayout(courseListPanel, BoxLayout.Y_AXIS));
 
-        ArrayList<Course> courses = controller.getInstructorCourses();
+        ArrayList<Course> courses = controller.getCourses();
 
         if (courses.isEmpty()) {
-            courseListPanel.add(new JLabel("You are not teaching any classes."));
+            String message = controller.getUser() instanceof Instructor ? "You are not teaching any classes." : "You are not enrolled in any classes.";
+            courseListPanel.add(new JLabel(message));
         } else {
             for (Course course : courses) {
                 JPanel card = createCourseCard(course);
@@ -40,7 +42,7 @@ public class ListViewClassesPanel extends JPanel {
         panel.setLayout(new BorderLayout());
         panel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); // visual feedback
     
-        JLabel nameLabel = new JLabel("<html><b>" + course.getName() + "</b> (" + course.getCode() + ")</html>");
+        JLabel nameLabel = new JLabel("<html><b>" + course.getName() + "</b> (" + course.getCourseCode() + ")</html>");
         JLabel instructorLabel = new JLabel("Instructor: " + course.getInstructor().getFullName());
     
         JTextArea descriptionArea = new JTextArea(course.getDescription());
