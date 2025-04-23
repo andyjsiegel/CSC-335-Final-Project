@@ -60,15 +60,19 @@ public class InstructorView extends JFrame {
         addClassButton.addActionListener(e -> showAddClassPanel());
 
         JButton addAssignmentButton = new JButton("List View Classes");
-        addAssignmentButton.addActionListener(e -> showAddAssignmentPanel());
+        addAssignmentButton.addActionListener(e -> showListViewClassesPanel());
 
         JButton viewCalendarButton = new JButton("View Calendar");
         viewCalendarButton.addActionListener(e -> showCalendarPanel());
 
+        JButton testing = new JButton("testing");
+        testing.addActionListener(e -> showTestingPanel());
+        
         bottomPanel.add(addClassButton);
         bottomPanel.add(addAssignmentButton);
         bottomPanel.add(viewCalendarButton);
-
+        bottomPanel.add(testing);
+        
         add(bottomPanel, BorderLayout.SOUTH);
     }
 
@@ -79,7 +83,7 @@ public class InstructorView extends JFrame {
         mainPanel.repaint();
     }
 
-    private void showAddAssignmentPanel() {
+    private void showListViewClassesPanel() {
         mainPanel.removeAll();
     
         mainPanel.add(new ListViewClassesPanel(controller), BorderLayout.CENTER);
@@ -88,18 +92,25 @@ public class InstructorView extends JFrame {
         mainPanel.repaint();
     }
 
-//    private void showCalendarPanel() {
-//        mainPanel.removeAll();
-//       
-//          //  CalendarView calendarView = new CalendarView(currentInstructor);
-//            //calendarView.setVisible(true);
-//
-//        mainPanel.add(new CalendarView(instructor));
-//       //mainPanel.add(new JLabel("Calendar Panel"), BorderLayout.CENTER);
-//        mainPanel.revalidate();
-//        mainPanel.repaint();
-//    }
-//    
+    private void showTestingPanel() {
+        mainPanel.removeAll();
+        Instructor instructor = controller.getInstructor();
+        // Provide the action to return to main panel
+        Course course = instructor.getCoursesManaged().get(0);
+        CourseDashboard testingPanel = new CourseDashboard(e -> returnToMainPanel(), course);
+
+        mainPanel.add(testingPanel, BorderLayout.CENTER);
+        mainPanel.revalidate();
+        mainPanel.repaint();
+    }
+
+    private void returnToMainPanel() {
+        mainPanel.removeAll();
+     
+        mainPanel.revalidate();
+        mainPanel.repaint();
+    }
+    
     private void showCalendarPanel() {
         new CalendarView(controller.getInstructor());
     }

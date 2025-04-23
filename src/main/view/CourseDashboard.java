@@ -89,12 +89,14 @@ public class CourseDashboard extends JPanel {
         // Add card panel to main layout
         add(cardPanel, BorderLayout.CENTER);
 
-        // === BOTTOM BACK BUTTON ===
-        JPanel bottomPanel = new JPanel();
-        JButton backBtn = new JButton("Back to Dashboard");
-        backBtn.addActionListener(backToInstructorViewAction);
-        bottomPanel.add(backBtn);
-        add(bottomPanel, BorderLayout.SOUTH);
+        // this is not needed, clicking List View/Add Class/Calendar View already works so this is redundant. 
+        /* === BOTTOM BACK BUTTON ===
+           JPanel bottomPanel = new JPanel();
+           JButton backBtn = new JButton("Back to Dashboard");
+           backBtn.addActionListener(backToInstructorViewAction);
+           bottomPanel.add(backBtn)
+           add(bottomPanel, BorderLayout.SOUTH); 
+        */
 
         // === BUTTON LOGIC ===
 
@@ -110,8 +112,8 @@ public class CourseDashboard extends JPanel {
 //            cardLayout.show(cardPanel, "classlist");
 //            cardPanel.revalidate();
 //            cardPanel.repaint();
-            gradesArea.setText(getGradesInfo());
-            cardLayout.show(cardPanel, "grades");
+            classlistArea.setText(getClasslistInfo());
+            cardLayout.show(cardPanel, "classlist");
             cardPanel.revalidate();
             cardPanel.repaint();
         });
