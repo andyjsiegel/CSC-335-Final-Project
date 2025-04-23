@@ -14,10 +14,18 @@ import java.io.FileReader;
 public class UserDatabase implements Iterable<User> {
     private String filePath;
     private HashMap<String, User> users = new HashMap<>();
+    public static UserDatabase instance;
     
     // Default constructor with default file path
-    public UserDatabase() {
+    private UserDatabase() {
         this("src/main/controller/users.csv");
+    }
+
+    public static UserDatabase getInstance() {
+        if (instance == null) {
+            instance = new UserDatabase();
+        }
+        return instance;
     }
 
     @Override
@@ -84,7 +92,10 @@ public class UserDatabase implements Iterable<User> {
                         System.err.println("Unknown role: " + role);
                         continue; // Skip unknown roles
                     }
-                    
+                    if(users.get(username) != null) {
+                        System.err.println("Username already exists: " + username);
+                        continue;
+                    }
                     users.put(username, user);
                 } else {
                     System.err.println("Invalid user data: " + line);
@@ -93,11 +104,6 @@ public class UserDatabase implements Iterable<User> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public HashMap<String, User> getUsers() {
-        // Return a copy of the map to avoid escaping reference
-        return new HashMap<>(users);
     }
 
     public User getUser(String username, String password) {
