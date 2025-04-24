@@ -8,19 +8,17 @@ import java.awt.*;
 
 //TODO: this class needs to sue a controller, also needs to be split up into smaller classes
 public class MainView extends JFrame {
-    //private user user;
     protected UserViewController controller;
     protected JPanel mainPanel;
 
+    
     public MainView(User user) {
-        //this.user = user;
         this.controller = new UserViewController(user);
-
         setupWindow();
-
         setVisible(true);
     }
 
+    
     private void setupWindow() {
         // Set up the main window
         setTitle("User Dashboard");
@@ -65,13 +63,13 @@ public class MainView extends JFrame {
         JButton viewCalendarButton = new JButton("View Calendar");
         viewCalendarButton.addActionListener(e -> showCalendarPanel());
 
-        JButton testing = new JButton("testing");
-        testing.addActionListener(e -> showTestingPanel());
+        //JButton testing = new JButton("testing");
+        //testing.addActionListener(e -> showTestingPanel());
         
         if(controller.getUser() instanceof Instructor) bottomPanel.add(addClassButton);
         bottomPanel.add(addAssignmentButton);
         bottomPanel.add(viewCalendarButton);
-        bottomPanel.add(testing);
+        //bottomPanel.add(testing);
         
         add(bottomPanel, BorderLayout.SOUTH);
     }
@@ -92,18 +90,16 @@ public class MainView extends JFrame {
         mainPanel.repaint();
     }
 
-    private void showTestingPanel() {
+    public void showCourseDashboard(Course course) {
         mainPanel.removeAll();
-        User user = controller.getUser();
-        // Provide the action to return to main panel
-        Course course = user.getCourses().get(0);
-        CourseDashboard testingPanel = new CourseDashboard(e -> returnToMainPanel(), course);
-
-        mainPanel.add(testingPanel, BorderLayout.CENTER);
+        controller.setSelectedCourse(course);
+        CourseDashboard dashboard = new CourseDashboard(e -> returnToMainPanel(), controller);
+        mainPanel.add(dashboard, BorderLayout.CENTER);
         mainPanel.revalidate();
         mainPanel.repaint();
     }
 
+  
     private void returnToMainPanel() {
         mainPanel.removeAll();
      
