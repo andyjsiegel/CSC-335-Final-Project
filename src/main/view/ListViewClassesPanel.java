@@ -59,11 +59,17 @@ public class ListViewClassesPanel extends JPanel {
         panel.add(top, BorderLayout.NORTH);
         panel.add(descriptionArea, BorderLayout.CENTER);
     
-        // 🎯 Add Mouse Listener to open detail view
+        // now when a course is clicked on, it will show its course.
+        // also im not sure why but it only works when you click on the BLACK TEXT
+        // and not just anywhere on the screen, it was like that before so idek :skull:
         panel.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                new ClassDetailsView(course, controller); // open new window
-            }
+        	public void mouseClicked(java.awt.event.MouseEvent evt) {
+        		JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(panel);
+        		if (topFrame instanceof MainView) {
+        			MainView mainView = (MainView) topFrame;
+        			mainView.showCourseDashboard(course);
+        		}
+        	}
         });
     
         return panel;
