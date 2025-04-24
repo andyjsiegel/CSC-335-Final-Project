@@ -1,18 +1,32 @@
 package main.tests;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import main.model.*;
-import java.util.Date;
+
 
 public class AssignmentGradeTest {
-    /*
-	@Test
-    public void testGetPercentage() {
-        Date now = new Date();
-        Assignment dummyAssignment = new Assignment(now, "Dummy Assignment");
-        AssignmentGrade grade = new AssignmentGrade(dummyAssignment, 50, 100, "Exam");
-        // Expected percentage: 50/100 = 0.5.
-        assertEquals(0.5, grade.getPercentage(), 0.001, "Percentage should be 0.5");
-    }*/
+	AssignmentGrade ag1, ag2;
+
+    @BeforeEach
+    void setup() {
+        ag1 = new AssignmentGrade(null,50,100,"HW");
+        ag2 = new AssignmentGrade(null, 0, 0, "E");
+    }
+
+    @Test
+    void testGetters() {
+        assertEquals(50, ag1.getPointsEarned());
+        assertEquals(100, ag1.getPointsPossible());
+        assertEquals("HW", ag1.getCategory());
+    }
+
+    @Test
+    void testPercentage() {
+        assertEquals(0.5, ag1.getPercentage());
+        assertEquals(0.0, ag2.getPercentage());
+    }
 }
+
