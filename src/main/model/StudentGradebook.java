@@ -88,6 +88,8 @@ public class StudentGradebook {
 	    this.median = median;
 	}
 
-
+	public ArrayList<Assignment> getAssignments() {
+		return new ArrayList<>(courseAssignments);
+	}
 
 }
