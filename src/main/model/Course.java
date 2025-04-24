@@ -1,8 +1,11 @@
 package main.model;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.Arrays;
 
 import javax.swing.*;
@@ -20,6 +23,7 @@ public class Course {
 
     private CourseAssignments assignments;
     private HashMap<String, Category> categories;
+    private HashMap<String, JLabel> assignmentLabels = new HashMap<String, JLabel>();
 
     
     public Course(String name, String code, String credits, String description,
@@ -50,14 +54,37 @@ public class Course {
     }
 
     public void addAllStudentsFromPool() {
+        ArrayList<Student> tempStudents = new ArrayList<Student>();
+        ArrayList<JCheckBox> tempCheckboxes = new ArrayList<JCheckBox>();
         // constructor pulls from users.csv
         for(User user : UserDatabase.getInstance()) {
             if(user instanceof Student) {
                 Student student = (Student) user;
-                this.studentList.add(student);
-                student.addCourse(this);
+                tempStudents.add(student);
+                // this.studentList.add(student);
+                // student.addCourse(this);
             }
         }
+        JPanel addStudentsPanel = new JPanel();
+        addStudentsPanel.setLayout(new GridLayout(0,2));
+        for(Student student : tempStudents) {
+            addStudentsPanel.add(new JLabel(student.getFirstName() + " " + student.getLastName()));
+            JCheckBox checkbox = new JCheckBox();
+            tempCheckboxes.add(checkbox);
+            addStudentsPanel.add(checkbox);
+        }
+
+        JButton addButton = new JButton("Add Selected Students");
+        addStudentsPanel.add(addButton);
+        addButton.addActionListener(_ -> {
+            for(int i = 0; i < tempStudents.size(); i++) {
+                if(tempCheckboxes.get(i).isSelected()) {
+                    this.studentList.add(tempStudents.get(i));
+                    tempStudents.get(i).addCourse(this);
+                }
+            }
+        });
+        JOptionPane.showMessageDialog(null, addStudentsPanel, "Add Students", JOptionPane.PLAIN_MESSAGE);
     }
 
     public void setDefaultCategories() {
@@ -262,7 +289,7 @@ public class Course {
             JOptionPane.showMessageDialog(null, this.getAssignmentAddPanel(), this.getCourseCode(), JOptionPane.PLAIN_MESSAGE);
         });
         assignmentsPanel.add(addAssignmentButton);
-        // keep a list of JCheckboxes in order
+        // keep a list of JCheckboxes and assignmentLabels in order
         ArrayList<JCheckBox> studentCheckboxes = new ArrayList<JCheckBox>();
 
         ArrayList<String> categoryTitles = new ArrayList<String>(categories.keySet());
@@ -280,7 +307,7 @@ public class Course {
             assignmentsGraded.setBorder(BorderFactory.createEmptyBorder(2, 20, 2, 2));
             assignmentsListPanel.setLayout(new BoxLayout(assignmentsListPanel, BoxLayout.Y_AXIS));
             assignmentsListPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-            assignmentsListPanel.add(assignmentsGraded);
+            if(!isInstructor) assignmentsListPanel.add(assignmentsGraded);
 
             // Add each assignment as a label or more complex component
             int numGraded = 0;
@@ -288,11 +315,12 @@ public class Course {
             int pointsPossible = categories.get(category).getPoints();
             for (Assignment assignment : assignments) {
                 // assignment.setGradeTo100();
-                if(assignment.getGrade() >= 0) {
+                if(assignment.isGraded()) {
                     pointsEarned += assignment.getGrade();
                     numGraded++;
                 }
-                JLabel assignmentLabel = new JLabel(assignment.getTitle() + " : " + (assignment.getGrade() >= 0 ? assignment.getGrade() + "/" + assignment.getMaxPoints() : "--/" + assignment.getMaxPoints()));
+                JLabel assignmentLabel = new JLabel(assignment.getTitle() + " : " + (assignment.isGraded() ? assignment.getGrade() + "/" + assignment.getMaxPoints() : "--/" + assignment.getMaxPoints()));
+                assignmentLabels.put(assignment.getTitle(), assignmentLabel);
                 assignmentLabel.setBorder(BorderFactory.createEmptyBorder(2, 20, 2, 2));
                 assignmentsListPanel.add(assignmentLabel);
                 JButton gradeAssignmentButton = new JButton("Grade");
@@ -303,15 +331,18 @@ public class Course {
                         JCheckBox checkbox = studentCheckboxes.get(i);
                         if(checkbox.isSelected()) {
                             Student student = this.getStudents().get(i);
-                            student.getGradebookForCourse(this).addAssignment(assignment, gradeEarned);
+                            student.getGradebookForCourse(this).addAssignment(new Assignment(assignment), gradeEarned);
+                            System.out.println("Set grade for assignment " + assignment + " for student " + student.getFullName() + " with grade " + gradeEarned);
                         }
                     }
-                    // this.getStudents().get();  
+                    updateAssignmentLabels(assignment.getTitle());
                 });
-                assignmentsListPanel.add(gradeAssignmentButton);
+                if(isInstructor) {
+                    assignmentsListPanel.add(gradeAssignmentButton);
+                }
             }
             
-            assignmentsGraded.setText(numGraded + "/" + assignments.size() + " " + category + " graded: " + pointsEarned + "/" + pointsPossible + " points earned");
+            assignmentsGraded.setText(numGraded + "/" + assignments.size() + " " + category + " graded" + ": " + pointsEarned + "/" + pointsPossible + " points earned");
             // Initially collapsed
             assignmentsListPanel.setVisible(false);
 
@@ -350,4 +381,34 @@ public class Course {
 
         return tabbedPane;
     }
+
+    private ArrayList<Assignment> getAssignmentsByName(String assignmentName) {
+        ArrayList<Assignment> assignments = new ArrayList<>();
+        for(Student s: getStudents()) {
+            StudentGradebook gb = s.getGradebookForCourse(this);
+            if(gb == null) continue;
+            List<Assignment> filteredAssignments = gb.getAssignments().stream()
+                .filter(assignment -> assignment.getTitle().equals(assignmentName))
+                .collect(Collectors.toList());
+            assignments.addAll(filteredAssignments);
+        }
+        System.out.println(assignments.size());
+        return assignments;
+    }
+
+    private void updateAssignmentLabels(String assignmentName) {
+        ArrayList<Assignment> assignments = getAssignmentsByName(assignmentName);
+        List<Assignment> gradedAssignments = assignments.stream().filter(assignment -> assignment.isGraded()).collect(Collectors.toList());
+        System.out.println(gradedAssignments.size());
+        double mean = gradedAssignments.stream().mapToDouble(Assignment::getGrade)
+            .average()
+            .orElse(0.0); 
+        double median = gradedAssignments.stream().mapToDouble(Assignment::getGrade)
+            .sorted()
+            .boxed()
+            .collect(Collectors.toList())
+            .get(gradedAssignments.size() / 2);
+        assignmentLabels.get(assignmentName).setText("Mean: " + String.format("%.2f", mean) + " Median: " + median);
+    }
+
 }
