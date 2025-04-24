@@ -12,12 +12,15 @@ import main.model.Instructor;
 public class UserViewController {
 
     private User user;
+    private Course selectedCourse;  
     private Gradebook gradebook = Gradebook.getInstance();
 
+    
     public UserViewController(User user) {
         this.user = user;
     }
 
+    
     public void addCourse(String className, String classCode, String credits, String classDescription, List<String> selectedDays) {
         if (!(user instanceof Instructor)) {
             throw new IllegalArgumentException("User is not an instructor and thus cannot create a course.");
@@ -48,6 +51,17 @@ public class UserViewController {
     public ArrayList<Course> getCourses() {
         return user.getCourses();
     }
+    
+   
+    public void setSelectedCourse(Course course) {
+        this.selectedCourse = course;
+    }
+
+    
+    public Course getSelectedCourse() {
+        return this.selectedCourse;
+    }
+
     
     public User getUser() {
     	return this.user;
