@@ -1,12 +1,15 @@
 package main.view;
 
 import javax.swing.*;
+import main.model.Assignment;
+
 import java.awt.*;
 import java.awt.event.ActionListener;
 
 import main.controller.UserViewController;
 import main.model.Course;
 import main.model.Student;
+import main.model.StudentGradebook;
 import main.model.StudentList;
 
 public class CourseDashboard extends JPanel {
@@ -15,6 +18,8 @@ public class CourseDashboard extends JPanel {
     private JPanel cardPanel;
     private JTextArea infoArea;
     private JButton cookieBtn;
+    private JButton sideAddAssignmentBtn;
+    private JButton addStudentBtn;
     private JPanel contentPanel;
     
     private UserViewController controller;
@@ -41,15 +46,26 @@ public class CourseDashboard extends JPanel {
         contentPanel.add(scrollPane, BorderLayout.CENTER);
 
         // this will be a button to add the students but ill add it later.. too much code :)
-        cookieBtn = new JButton("cookie!");
+        sideAddAssignmentBtn = new JButton("Add Assignment");
+        sideAddAssignmentBtn.setVisible(false);
+
+        cookieBtn = new JButton("Grade a srduent!");
         cookieBtn.setVisible(false);
 
+        addStudentBtn = new JButton("Add Student");
+        addStudentBtn.setVisible(false); // only visible in Classlist view
+
+
+        
         JPanel rightPanel = new JPanel();
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
         
         rightPanel.add(Box.createVerticalStrut(100));
+        rightPanel.add(sideAddAssignmentBtn);
         rightPanel.add(cookieBtn);
+        rightPanel.add(addStudentBtn);
         rightPanel.add(Box.createVerticalGlue());
+
 
         contentPanel.add(rightPanel, BorderLayout.EAST);
 
@@ -157,24 +173,145 @@ public class CourseDashboard extends JPanel {
 
         viewGradesBtn.addActionListener(e -> {
             infoArea.setText(getGradesInfo());
-            cookieBtn.setVisible(true);  // show cookie
+            sideAddAssignmentBtn.setVisible(false);
+            cookieBtn.setVisible(true);
+            addStudentBtn.setVisible(false);
+
         });
 
         addClasslistBtn.addActionListener(e -> {
             infoArea.setText(getClasslistInfo());
-            cookieBtn.setVisible(false);  // hide cookie
+            sideAddAssignmentBtn.setVisible(false);
+            cookieBtn.setVisible(false);
+            addStudentBtn.setVisible(true);
+
         });
 
         addAssignmentBtn.addActionListener(e -> {
-            infoArea.setText("Assignments feature coming soon...");
-            cookieBtn.setVisible(false);  // hide cookie
+            Course selectedCourse = controller.getSelectedCourse();
+
+            // STEP 1: Show existing assignments in infoArea
+            updateAssignmentDisplay();
+            sideAddAssignmentBtn.setVisible(true);
+
+            // Show assignment creation form
+            JPanel assignmentPanel = selectedCourse.getAssignmentAddPanel();
+            
+            // set the other clickers to false
+            cookieBtn.setVisible(false);
+            addStudentBtn.setVisible(false);
+
         });
 
+        addStudentBtn.addActionListener(e -> {
+            controller.getSelectedCourse().addAllStudentsFromPool();
+            infoArea.setText(getClasslistInfo()); // refresh after adding
+        });
+        
+        sideAddAssignmentBtn.addActionListener(e -> {
+            Course selectedCourse = controller.getSelectedCourse();
+            JPanel assignmentPanel = selectedCourse.getAssignmentAddPanel();
+            int result = JOptionPane.showConfirmDialog(this, assignmentPanel, selectedCourse.getCourseCode(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            if (result == JOptionPane.OK_OPTION) {
+                updateAssignmentDisplay();
+            }
+        });
+
+
+        // cookie btn is the addstudnent one, i just gotta change the labels, 
+       
         cookieBtn.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "should be an option to enter a student to add/ general");
+            Course cur = controller.getSelectedCourse();
+            StudentList studentList = cur.getStudents();
+
+            if (studentList.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "No students to grade.");
+                return;
+            }
+
+            // === STUDENT DROPDOWN ===
+            JComboBox<Student> studentDropdown = new JComboBox<>();
+            for (Student student : studentList) {
+                studentDropdown.addItem(student);
+            }
+
+            // === CATEGORY DROPDOWN ===
+            JComboBox<String> categoryDropdown = new JComboBox<>(cur.getCategories().keySet().toArray(new String[0]));
+
+            // === ASSIGNMENT DROPDOWN (will be dynamically updated) ===
+            JComboBox<String> assignmentDropdown = new JComboBox<>();
+            categoryDropdown.addActionListener(e2 -> {
+                assignmentDropdown.removeAllItems();
+                String selectedCategory = (String) categoryDropdown.getSelectedItem();
+                for (Assignment a : course.getCategories().get(selectedCategory).getAssignments()) {
+                    assignmentDropdown.addItem(a.getTitle());
+                }
+            });
+
+            // Trigger once at start
+            if (categoryDropdown.getItemCount() > 0) {
+                categoryDropdown.setSelectedIndex(0);
+            }
+
+            JTextField gradeField = new JTextField(5);
+
+            // === GRADING PANEL ===
+            JPanel gradingPanel = new JPanel(new GridLayout(0, 1));
+            gradingPanel.add(new JLabel("Select Student:"));
+            gradingPanel.add(studentDropdown);
+            gradingPanel.add(new JLabel("Select Category:"));
+            gradingPanel.add(categoryDropdown);
+            gradingPanel.add(new JLabel("Select Assignment:"));
+            gradingPanel.add(assignmentDropdown);
+            gradingPanel.add(new JLabel("Enter Grade:"));
+            gradingPanel.add(gradeField);
+
+            int result = JOptionPane.showConfirmDialog(this, gradingPanel, "Grade Assignment", JOptionPane.OK_CANCEL_OPTION);
+            if (result == JOptionPane.OK_OPTION) {
+                try {
+                    Student selectedStudent = (Student) studentDropdown.getSelectedItem();
+                    String category = (String) categoryDropdown.getSelectedItem();
+                    String assignmentTitle = (String) assignmentDropdown.getSelectedItem();
+                    double grade = Double.parseDouble(gradeField.getText());
+
+                    Assignment originalAssignment = cur.getCategories().get(category).getAssignments().stream()
+                        .filter(a -> a.getTitle().equals(assignmentTitle))
+                        .findFirst()
+                        .orElse(null);
+
+                    if (originalAssignment != null && selectedStudent != null) {
+                        selectedStudent.getGradebookForCourse(course).addAssignment(new Assignment(originalAssignment), grade);
+                        JOptionPane.showMessageDialog(this, "Grade assigned successfully!");
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Invalid selection.");
+                    }
+
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+                }
+            }
         });
     }
 
+    private void updateAssignmentDisplay() {
+        Course selectedCourse = controller.getSelectedCourse();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Assignments for ").append(selectedCourse.getName()).append(":\n\n");
+
+        for (String category : selectedCourse.getCategories().keySet()) {
+            sb.append("Category: ").append(category).append("\n");
+            for (main.model.Assignment a : selectedCourse.getCategories().get(category).getAssignments()) {
+                sb.append("  - ").append(a.getTitle())
+                  .append(" (Max Points: ").append(a.getMaxPoints()).append(")\n");
+            }
+            sb.append("\n");
+        }
+
+        infoArea.setText(sb.toString());
+    }
+
+    
     private String getClasslistInfo() {
         StringBuilder sb = new StringBuilder();
         StudentList classlist = controller.getSelectedCourse().getStudents();
@@ -190,19 +327,36 @@ public class CourseDashboard extends JPanel {
     }
 
     private String getGradesInfo() {
-        StringBuilder sb = new StringBuilder();
-        StudentList classlist = controller.getSelectedCourse().getStudents();
+        Course course = controller.getSelectedCourse();
+        StudentList classlist = course.getStudents();
 
-        sb.append("Grades for ").append(controller.getSelectedCourse().getName()).append(":\n\n");
+        StringBuilder sb = new StringBuilder();
+        sb.append("Grades for ").append(course.getName()).append(":\n\n");
 
         for (Student student : classlist) {
-            sb.append(student.getFirstName()).append(" - ");
-            try {
-                sb.append("Grade info placeholder");
-            } catch (Exception e) {
-                sb.append("Grade info not available");
+            sb.append(student.getFirstName()).append(" ").append(student.getLastName()).append(":\n");
+
+            StudentGradebook gb = student.getGradebookForCourse(course);
+            if (gb == null || gb.getAssignments().isEmpty()) {
+                sb.append("  No grades available.\n\n");
+                continue;
             }
-            sb.append("\n");
+
+            double totalEarned = 0;
+            double totalPossible = 0;
+
+            for (Assignment a : gb.getAssignments()) {
+                sb.append("  ").append(a.getTitle())
+                  .append(" - ").append(a.getGrade())
+                  .append("/").append(a.getMaxPoints()).append("\n");
+                totalEarned += a.getGrade();
+                totalPossible += a.getMaxPoints();
+            }
+
+            double percentage = (totalPossible > 0) ? (100 * totalEarned / totalPossible) : 0;
+            sb.append("  Total: ").append(String.format("%.2f", totalEarned)).append("/")
+              .append(String.format("%.2f", totalPossible))
+              .append(" (").append(String.format("%.2f", percentage)).append("%)\n\n");
         }
 
         return sb.toString();
