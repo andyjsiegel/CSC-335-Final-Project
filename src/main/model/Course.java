@@ -149,6 +149,10 @@ public class Course {
     public ArrayList<Days> getDays() {
         return daysOfWeek;
     }
+    
+    public String getCredits() {
+    	return credits; 
+    }
 
     public JPanel getAssignmentAddPanel() {
         JPanel panel = new JPanel();

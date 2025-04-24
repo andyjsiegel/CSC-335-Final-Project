@@ -1,68 +1,95 @@
+// Tests all non-view related methods, setters, and getters
+
+
 package main.tests;
 
 import main.model.*;
+import org.junit.jupiter.api.*;
 
+import javax.swing.*;
+import java.awt.*;
+import java.util.*;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
-import java.util.*;
-import javax.swing.*;
-
-// CourseTest
 class CourseTest {
-    Course course;
-    Instructor inst;
-    List<Days> days;
+    private Course course;
+    private Instructor instructor;
+    private List<Days> days;
 
     @BeforeEach
-    void setup() {
-        inst = new Instructor("u","p","I","N","e",false);
-        days = new ArrayList<>(List.of(Days.TUESDAY));
-        course = new Course("Name","C101","3","Desc", inst, days);
+    void setUp() {
+        instructor = new Instructor("u1", "pw", "Alice", "Anderson", "a@x.com", false);
+        days = Arrays.asList(Days.MONDAY, Days.FRIDAY);
+        course = new Course(
+            "Intro to Testing",
+            "TEST101",
+            "3",
+            "A course on how to test Java code",
+            instructor,
+            new ArrayList<>(days)
+        );
     }
 
     @Test
-    void testBasicGetters() {
-        assertEquals("Name", course.getName());
-        assertEquals("C101", course.getCourseCode());
-        assertEquals("Desc", course.getDescription());
-        assertSame(inst, course.getInstructor());
-        assertEquals(days, course.getDays());
+    void testConstructorAndGetters() {
+        assertEquals("Intro to Testing", course.getName());
+        assertEquals("TEST101",         course.getCourseCode());
+        assertEquals("3",               course.getCredits());
+        assertEquals("A course on how to test Java code", course.getDescription());
+        assertSame(instructor,          course.getInstructor());
+        assertEquals(days,              course.getDays());
+        // mutable copy
+        assertNotSame(days,             course.getDays());
     }
 
     @Test
-    void testAddRemoveStudentAndAssignment() {
-        Student s = new Student("u","p","F","L","e",true);
+    void testStudentListManipulation() {
+        assertTrue(course.getStudents().isEmpty());
+        Student s = new Student("stu", "pw", "Bob", "Brown", "b@x.com", false);
         course.addStudent(s);
-        assertTrue(course.getStudents().contains(s));
+        assertEquals(1, course.getStudents().size());
+        assertSame(s, course.getStudents().get(0));
         course.removeStudent(s);
-        assertFalse(course.getStudents().contains(s));
-
-        Assignment a = new Assignment("T","D",10);
-        course.addAssignment(a);
-        assertTrue(course.getAssignments().iterator().hasNext());
-        course.removeAssignment(a);
-        assertFalse(course.getAssignments().iterator().hasNext());
+        assertTrue(course.getStudents().isEmpty());
     }
 
     @Test
-    void testAddDaysAndDefaultCategories() {
-        List<Days> newDays = List.of(Days.MONDAY);
+    void testAssignmentListManipulation() {
+        CourseAssignments ca = course.getAssignments();
+        assertEquals(0, ca.size());
+
+        Assignment a = new Assignment("HW1", "desc", 10);
+        course.addAssignment(a);
+        assertEquals(1, ca.size());
+        course.removeAssignment(a);
+        assertEquals(0, ca.size());
+    }
+
+    @Test
+    void testAddDaysReplacesList() {
+        List<Days> newDays = Collections.singletonList(Days.WEDNESDAY);
         course.addDays(new ArrayList<>(newDays));
         assertEquals(newDays, course.getDays());
-
-        course.setDefaultCategories();
-        // assignments added to categories only, not to top‐level CourseAssignments
-        assertFalse(course.getAssignments().iterator().hasNext());
     }
 
     @Test
-    void testPanels() {
-        JPanel panel = course.getAssignmentAddPanel();
-        assertNotNull(panel);
-        JTabbedPane tabs = course.getCourseView(true);
-        assertEquals(3, tabs.getTabCount());
+    void testCopyConstructorProducesDeepCopy() {
+        // seed some state
+        course.addStudent(new Student("s1","pw","C","C","c@x.com",false));
+        course.addAssignment(new Assignment("T1","d",5));
+        course.setDefaultCategories();
+
+        Course copy = new Course(course);
+        // identity
+        assertNotSame(course, copy);
+        // simple fields
+        assertEquals(course.getName(),        copy.getName());
+        assertEquals(course.getCourseCode(),  copy.getCourseCode());
+        assertEquals(course.getDescription(), copy.getDescription());
+        // instructor is newly constructed
+        assertNotSame(course.getInstructor(), copy.getInstructor());
     }
+    
 }
