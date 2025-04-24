@@ -103,6 +103,10 @@ public class Course {
         categories.put("Final Exam", finalExam);
     }
 
+    
+    public HashMap<String, Category> getCategories(){
+    	return this.categories;
+    }
     public CourseAssignments getAssignments() {
         return assignments;
     }
@@ -148,10 +152,6 @@ public class Course {
 
     public ArrayList<Days> getDays() {
         return daysOfWeek;
-    }
-    
-    public String getCredits() {
-    	return credits; 
     }
 
     public JPanel getAssignmentAddPanel() {
