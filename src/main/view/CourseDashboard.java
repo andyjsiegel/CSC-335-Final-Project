@@ -3,6 +3,8 @@ package main.view;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+
+import main.controller.UserViewController;
 import main.model.Course;
 import main.model.Student;
 import main.model.StudentList;
@@ -11,10 +13,16 @@ public class CourseDashboard extends JPanel {
 
     private CardLayout cardLayout;
     private JPanel cardPanel;
-    private Course course;
+    private JTextArea infoArea;
+    private JButton cookieBtn;
+    private JPanel contentPanel;
+    
+    private UserViewController controller;
 
-    public CourseDashboard(ActionListener backToInstructorViewAction, Course course) {
-        this.course = course;
+    public CourseDashboard(ActionListener backToInstructorViewAction, UserViewController controller) {
+        
+    	this.controller = controller;
+        Course course = controller.getSelectedCourse();
         setLayout(new BorderLayout());
 
         // === Initialize card layout ===
@@ -23,21 +31,103 @@ public class CourseDashboard extends JPanel {
 
         // === MAIN VIEW PANEL ===
         JPanel mainViewPanel = new JPanel(new BorderLayout());
-        JTextArea infoArea = new JTextArea("Welcome to the course dashboard.");
+
+        infoArea = new JTextArea("Welcome to the course dashboard.");
         infoArea.setEditable(false);
-        mainViewPanel.add(new JScrollPane(infoArea), BorderLayout.CENTER);
+
+        JScrollPane scrollPane = new JScrollPane(infoArea);
+
+        contentPanel = new JPanel(new BorderLayout());
+        contentPanel.add(scrollPane, BorderLayout.CENTER);
+
+        // this will be a button to add the students but ill add it later.. too much code :)
+        cookieBtn = new JButton("cookie!");
+        cookieBtn.setVisible(false);
+
+        JPanel rightPanel = new JPanel();
+        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+        
+        rightPanel.add(Box.createVerticalStrut(100));
+        rightPanel.add(cookieBtn);
+        rightPanel.add(Box.createVerticalGlue());
+
+        contentPanel.add(rightPanel, BorderLayout.EAST);
+
+        mainViewPanel.add(contentPanel, BorderLayout.CENTER);
 
         // === TOP SECTION ===
         JPanel upperInfo = new JPanel(new BorderLayout());
-        upperInfo.setBackground(Color.LIGHT_GRAY);
-        upperInfo.setPreferredSize(new Dimension(800, 100));
+        upperInfo.setBackground(Color.WHITE);
+        upperInfo.setPreferredSize(new Dimension(800, 60));
 
-        // Add Student Button
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        buttonPanel.setOpaque(false);
-        JButton addStudentBtn = new JButton("Add Student");
-        buttonPanel.add(addStudentBtn);
-        upperInfo.add(buttonPanel, BorderLayout.CENTER);
+        // === LEFT SIDE: Logo + Course Name ===
+        ImageIcon icon = new ImageIcon("assets/UOFAD2L.png");
+        Image scaledImage = icon.getImage().getScaledInstance(280, 100, Image.SCALE_SMOOTH);
+        icon = new ImageIcon(scaledImage);
+        JLabel imageLabel = new JLabel(icon);
+
+        // Panel to group logo + course name
+        JPanel leftInfoPanel = new JPanel();
+        leftInfoPanel.setOpaque(false);
+        leftInfoPanel.setLayout(new BoxLayout(leftInfoPanel, BoxLayout.X_AXIS));
+
+        // Course name label
+        JLabel courseNameLabel = new JLabel(course.getName() + " - " + course.getCourseCode());
+        courseNameLabel.setFont(new Font("SansSerif", Font.PLAIN, 18));
+        courseNameLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0)); // space between logo and text
+
+        // Add both to the left panel
+        leftInfoPanel.add(imageLabel);
+        leftInfoPanel.add(courseNameLabel);
+
+        // Add to left side of upperInfo
+        upperInfo.add(leftInfoPanel, BorderLayout.WEST);
+
+        // === PROFILE PIC + first name/lastname  OVERLAY ===
+        ImageIcon pfpIcon = new ImageIcon("assets/PFPSQUARE.png");
+        Image scalePFP = pfpIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+        pfpIcon = new ImageIcon(scalePFP);
+
+        JLabel pfpLabel = new JLabel(pfpIcon);
+        pfpLabel.setAlignmentX(0.5f);
+        pfpLabel.setAlignmentY(0.5f);
+
+        // Text overlay on the picture
+        JLabel overlayText = new JLabel("" + course.getInstructor().getFirstName().charAt(0) + "" + course.getInstructor().getLastName().charAt(0));
+        overlayText.setFont(new Font("SansSerif", Font.BOLD, 12));
+        overlayText.setForeground(Color.WHITE);
+        overlayText.setHorizontalAlignment(SwingConstants.CENTER);
+        overlayText.setVerticalAlignment(SwingConstants.CENTER);
+        overlayText.setAlignmentX(0.5f);
+        overlayText.setAlignmentY(0.5f);
+
+        // Panel to layer the image and the overlay text
+        JPanel overlayPanel = new JPanel();
+        overlayPanel.setLayout(new OverlayLayout(overlayPanel));
+        overlayPanel.setOpaque(false);
+        overlayPanel.add(overlayText);   
+        overlayPanel.add(pfpLabel);      
+
+        // === USERNAME LABEL ===
+        JLabel userNameLabel = new JLabel(course.getInstructor().getFullName());
+        userNameLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        userNameLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0)); // space from image
+
+        // === Group name + image in one right-aligned panel
+        JPanel userInfoPanel = new JPanel();
+        userInfoPanel.setLayout(new BoxLayout(userInfoPanel, BoxLayout.X_AXIS));
+        userInfoPanel.setOpaque(false);
+        userInfoPanel.add(overlayPanel);
+        userInfoPanel.add(Box.createHorizontalStrut(5));
+        userInfoPanel.add(userNameLabel);
+
+        // right-aligned 
+        JPanel rightInfoPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 80, 10));
+        rightInfoPanel.setOpaque(false);
+        rightInfoPanel.add(userInfoPanel);
+
+        // === Add to top bar
+        upperInfo.add(rightInfoPanel, BorderLayout.EAST);
 
         // Button Row
         JPanel mainButtonPanel = new JPanel();
@@ -48,7 +138,7 @@ public class CourseDashboard extends JPanel {
         mainButtonPanel.add(addClasslistBtn);
         mainButtonPanel.add(viewGradesBtn);
 
-        // Stack Top
+        // Top Section Combined
         JPanel topContainer = new JPanel();
         topContainer.setLayout(new BoxLayout(topContainer, BoxLayout.Y_AXIS));
         topContainer.add(upperInfo);
@@ -56,86 +146,40 @@ public class CourseDashboard extends JPanel {
 
         mainViewPanel.add(topContainer, BorderLayout.NORTH);
 
-        // === GRADES PANEL ===
-        JPanel gradesPanel = new JPanel(new BorderLayout());
-        JTextArea gradesArea = new JTextArea("Grades content here...");
-        gradesArea.setEditable(false);
-        gradesPanel.add(new JScrollPane(gradesArea), BorderLayout.CENTER);
-
-        JPanel gradesButtonPanel = new JPanel();
-        JButton backToMainBtn = new JButton("Back");
-        gradesButtonPanel.add(backToMainBtn);
-        gradesPanel.add(gradesButtonPanel, BorderLayout.SOUTH);
-
-        // === CLASSLIST PANEL ===
-        JPanel classlistPanel = new JPanel(new BorderLayout());
-        JTextArea classlistArea = new JTextArea("Classlist content here...");
-        classlistArea.setEditable(false);
-        classlistPanel.add(new JScrollPane(classlistArea), BorderLayout.CENTER);
-
-        JPanel classlistButtonPanel = new JPanel();
-        JButton backFromClasslistBtn = new JButton("Back");
-        classlistButtonPanel.add(backFromClasslistBtn);
-        classlistPanel.add(classlistButtonPanel, BorderLayout.SOUTH);
-
-        // === Add all panels to cardPanel ===
+        // === Add only the main panel to cardPanel ===
         cardPanel.add(mainViewPanel, "main");
-        cardPanel.add(gradesPanel, "grades");
-        cardPanel.add(classlistPanel, "classlist");
-
-        // Set default view
         cardLayout.show(cardPanel, "main");
 
-        // Add card panel to main layout
         add(cardPanel, BorderLayout.CENTER);
 
-        // this is not needed, clicking List View/Add Class/Calendar View already works so this is redundant. 
-        /* === BOTTOM BACK BUTTON ===
-           JPanel bottomPanel = new JPanel();
-           JButton backBtn = new JButton("Back to Dashboard");
-           backBtn.addActionListener(backToInstructorViewAction);
-           bottomPanel.add(backBtn)
-           add(bottomPanel, BorderLayout.SOUTH); 
-        */
-
-        // === BUTTON LOGIC ===
+        // === BUTTON LOGIC === (it will be placeholder for adding students and assignemnts, just testing
+        // how it would look like)
 
         viewGradesBtn.addActionListener(e -> {
-            gradesArea.setText(getGradesInfo());
-            cardLayout.show(cardPanel, "grades");
-            cardPanel.revalidate();
-            cardPanel.repaint();
+            infoArea.setText(getGradesInfo());
+            cookieBtn.setVisible(true);  // show cookie
         });
 
         addClasslistBtn.addActionListener(e -> {
-//            classlistArea.setText(getClasslistInfo());
-//            cardLayout.show(cardPanel, "classlist");
-//            cardPanel.revalidate();
-//            cardPanel.repaint();
-            classlistArea.setText(getClasslistInfo());
-            cardLayout.show(cardPanel, "classlist");
-            cardPanel.revalidate();
-            cardPanel.repaint();
+            infoArea.setText(getClasslistInfo());
+            cookieBtn.setVisible(false);  // hide cookie
         });
 
-        backToMainBtn.addActionListener(e -> {
-            cardLayout.show(cardPanel, "main");
-            cardPanel.revalidate();
-            cardPanel.repaint();
+        addAssignmentBtn.addActionListener(e -> {
+            infoArea.setText("Assignments feature coming soon...");
+            cookieBtn.setVisible(false);  // hide cookie
         });
 
-        backFromClasslistBtn.addActionListener(e -> {
-            cardLayout.show(cardPanel, "main");
-            cardPanel.revalidate();
-            cardPanel.repaint();
+        cookieBtn.addActionListener(e -> {
+            JOptionPane.showMessageDialog(this, "should be an option to enter a student to add/ general");
         });
     }
 
     private String getClasslistInfo() {
         StringBuilder sb = new StringBuilder();
-        StudentList classlist = course.getStudents();
+        StudentList classlist = controller.getSelectedCourse().getStudents();
 
-        sb.append("Classlist for ").append(course.getName()).append(":\n\n");
+        sb.append("Classlist for ").append(controller.getSelectedCourse().getName()).append(":\n\n");
 
         for (Student student : classlist) {
             sb.append(student.getFirstName()).append(" ").append(student.getLastName());
@@ -147,16 +191,13 @@ public class CourseDashboard extends JPanel {
 
     private String getGradesInfo() {
         StringBuilder sb = new StringBuilder();
-        StudentList classlist = course.getStudents();
+        StudentList classlist = controller.getSelectedCourse().getStudents();
 
-        sb.append("Grades for ").append(course.getName()).append(":\n\n");
+        sb.append("Grades for ").append(controller.getSelectedCourse().getName()).append(":\n\n");
 
         for (Student student : classlist) {
             sb.append(student.getFirstName()).append(" - ");
             try {
-
-                // double avg = student.getGradebook().calculateAverageForCourse(course);
-                // sb.append(String.format("GPA: %.2f", avg));
                 sb.append("Grade info placeholder");
             } catch (Exception e) {
                 sb.append("Grade info not available");
