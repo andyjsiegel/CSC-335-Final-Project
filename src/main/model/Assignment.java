@@ -22,6 +22,13 @@ public class Assignment {
         this.maxPoints = maxPoints;
         this.points = -1; // <0 score means not graded. 
     }
+
+    public Assignment(Assignment other) {
+        this.title = other.title;
+        this.description = other.description;
+        this.maxPoints = other.maxPoints;
+        this.points = other.points;
+    }
     
     public String getTitle() {
     	return title;
@@ -33,6 +40,10 @@ public class Assignment {
     
     public void setGradeTo100() {
         this.points = this.maxPoints;
+    }
+
+    public boolean isGraded() {
+        return this.points >= 0;
     }
  
     public void setGrade(Double grade) {
