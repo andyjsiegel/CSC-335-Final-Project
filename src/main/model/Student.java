@@ -125,12 +125,19 @@ public class Student extends User {
 		return null; // Return null if the course is not found
 	}
 
-	public void setFinalGradeForCourse(CourseDashboard course, String grade) {
-		int index = coursesTaken.indexOf(course);
-		if (index != -1) {
-			gradebooks.get(index).setFinalGrade(Double.parseDouble(grade));
-		} else {
-			System.out.println("Course not found for the student.");
-		}
+	public void setFinalGradeForCourse(Course course, String gradeStr) {
+	    int index = coursesTaken.indexOf(course);
+	    if (index == -1) {
+	        System.out.println("Course not found for the student.");
+	        return;
+	    }
+
+	    try {
+	        // Convert the user’s input ("A", "b", etc.) into the enum
+	        FinalGrades fg = FinalGrades.valueOf( gradeStr.trim().toUpperCase() );
+	        gradebooks.get(index).setFinalGrade(fg);
+	    } catch (IllegalArgumentException e) {
+	        System.out.println("Invalid final‐grade value: “" + gradeStr + "”. Use A, B, C, D, or E.");
+	    }
 	}
 }

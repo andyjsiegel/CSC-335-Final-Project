@@ -6,6 +6,9 @@ import main.model.Assignment;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import main.controller.UserViewController;
 import main.model.Course;
@@ -24,9 +27,10 @@ public class CourseDashboard extends JPanel {
     private JButton addStudentBtn;
     private JButton setFinalGradesBtn;
     private JPanel contentPanel;
-    
     private JButton removeStudentBtn;
     private JLabel classStatsLabel;
+    private JButton addClasslistBtn;  // moved this to the class level for back button logic
+    
 
     
     private UserViewController controller;
@@ -162,7 +166,7 @@ public class CourseDashboard extends JPanel {
         // Button Row
         JPanel mainButtonPanel = new JPanel();
         JButton addAssignmentBtn = new JButton("Assignments");
-        JButton addClasslistBtn = new JButton("Classlist");
+        addClasslistBtn = new JButton("Classlist");
         JButton viewGradesBtn = new JButton("Grades");
         mainButtonPanel.add(addAssignmentBtn);
         mainButtonPanel.add(addClasslistBtn);
@@ -212,68 +216,12 @@ public class CourseDashboard extends JPanel {
 
         });
         
-        addClasslistBtn.addActionListener(e -> {
-            updateSortedClasslist(0); // default sort by first name
-            sideAddAssignmentBtn.setVisible(false);
-            gradeStudentBtn.setVisible(false);
-            setFinalGradesBtn.setVisible(false);
-            addStudentBtn.setVisible(true);
-            classStatsLabel.setVisible(false);  
-            removeStudentBtn.setVisible(true);
-
-            // === SORT DROPDOWN ===
-            JComboBox<String> sortOptions = new JComboBox<>(new String[] {
-                "Sort by First Name", "Sort by Last Name", "Sort by Username", "Sort by grades on an assignment"
-            });
-
-            sortOptions.addActionListener(e2 -> {
-                int selectedIndex = sortOptions.getSelectedIndex();
-                if (selectedIndex == 3) { // Sort by grades on an assignment
-                
-                    ArrayList<String> allAssignments = new ArrayList<>();
-
-                    for (String category : controller.getSelectedCourse().getCategories().keySet()) {
-                        for (Assignment a : controller.getSelectedCourse().getCategories().get(category).getAssignments()) {
-                            allAssignments.add(a.getTitle());
-                        }
-                    }
-
-                    if (allAssignments.isEmpty()) {
-                        JOptionPane.showMessageDialog(this, "No assignments found to sort by.");
-                        return;
-                    }
-
-                    String assignmentName = (String) JOptionPane.showInputDialog(
-                        this,
-                        "Select an assignment to sort by grade:",
-                        "Sort by Assignment Grade",
-                        JOptionPane.PLAIN_MESSAGE,
-                        null,
-                        allAssignments.toArray(),
-                        allAssignments.get(0)
-                    );
-
-                    if (assignmentName != null) {
-                        updateSortedClasslist(3, assignmentName); 
-                    }
-
-                } else {
-                    updateSortedClasslist(selectedIndex);
-                }
-            });
-
-
-            // remove existing dropdowns and add the new one
-            for (Component comp : contentPanel.getComponents()) {
-                if (comp instanceof JComboBox) {
-                    contentPanel.remove(comp);
-                }
-            }
-            contentPanel.add(sortOptions, BorderLayout.NORTH);
-            contentPanel.revalidate();
-            contentPanel.repaint();
-        });
-
+        
+        /** 
+         * === NOW THIS JUST CALLS OUR HELPER WHICH HAS IDENTICAL 
+         * LOGIC TO PREVIOUS IMPLEMENTATION ===
+        */
+        addClasslistBtn.addActionListener(e -> showClasslistView());
 
         addAssignmentBtn.addActionListener(e -> {
             updateAssignmentDisplay();
@@ -484,15 +432,6 @@ public class CourseDashboard extends JPanel {
         });
     }
 
-    // Helper method to convert percentage to grade
-    private FinalGrades calculateFinalGrade(double percentage) {
-        if (percentage >= 90) return FinalGrades.A;
-        if (percentage >= 80) return FinalGrades.B;
-        if (percentage >= 70) return FinalGrades.C;
-        if (percentage >= 60) return FinalGrades.D;
-        return FinalGrades.E;
-    }
-
     private void updateAssignmentDisplay() {
         Course selectedCourse = controller.getSelectedCourse();
 
@@ -525,31 +464,6 @@ public class CourseDashboard extends JPanel {
 
         return sb.toString();
     }
-    
-    private void updateSortedClasslist(int sortOption) {
-        Course course = controller.getSelectedCourse();
-        StudentList students = new StudentList(course.getStudents()); 
-
-        switch (sortOption) {
-            case 0: students.sortByFirstName(); break;
-            case 1: students.sortByLastName(); break;
-            case 2: students.sortByUsername(); break;
-            case 3:
-            	students.sortByAssignmentGrade(controller.getSelectedCourse().getName());
-            	break;
-        }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("Classlist for ").append(course.getName()).append(":\n\n");
-
-        for (Student student : students) {
-            sb.append(student.getFirstName()).append(" ").append(student.getLastName())
-              .append(" - ").append(student.getEmail()).append("\n");
-        }
-
-        infoArea.setText(sb.toString());
-    }
-
     
     private String getGradesInfo() {
         Course course = controller.getSelectedCourse();
@@ -594,22 +508,164 @@ public class CourseDashboard extends JPanel {
         return sb.toString();
     }
     
-    private void updateSortedClasslist(int sortOption, String assignmentName) {
-        Course course = controller.getSelectedCourse();
-        StudentList students = new StudentList(course.getStudents()); // copy
+    /**
+     * == CENTRALIZED TO SIMPLIFY BACK BUTTON LOGIC AND NOT REBUILD THE VIEW BUT JUST CALL THIS ==
+     * Centralized routine to show the Classlist view with sorting dropdown.
+     */
+    private void showClasslistView() {
+        // 1) Populate the infoArea with the unsorted classlist
+        updateSortedClasslist(0);
 
-        if (sortOption == 3) {
-            students.sortByAssignmentGrade(assignmentName);
+        // 2) Adjust button visibility
+        sideAddAssignmentBtn.setVisible(false);
+        gradeStudentBtn.setVisible(false);
+        setFinalGradesBtn.setVisible(false);
+        addStudentBtn.setVisible(true);
+        removeStudentBtn.setVisible(true);
+        classStatsLabel.setVisible(false);
+
+        // 3) Remove any old JComboBox
+        for (Component comp : contentPanel.getComponents()) {
+            if (comp instanceof JComboBox) {
+                contentPanel.remove(comp);
+            }
+        }
+
+        // 4) Create and add the sort-by dropdown
+        JComboBox<String> sortOptions = new JComboBox<>(new String[] {
+            "Sort by First Name",
+            "Sort by Last Name",
+            "Sort by Username",
+            "Sort by grades on an assignment"
+        });
+        sortOptions.addActionListener(evt -> {
+            int idx = sortOptions.getSelectedIndex();
+            if (idx == 3) {
+                // --- Show assignment-selection dialog ---
+                ArrayList<String> allAssignments = new ArrayList<>();
+                for (String cat : controller.getSelectedCourse().getCategories().keySet()) {
+                    for (Assignment a : controller.getSelectedCourse()
+                                                 .getCategories().get(cat)
+                                                 .getAssignments()) {
+                        allAssignments.add(a.getTitle());
+                    }
+                }
+                if (allAssignments.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "No assignments found to sort by.");
+                    return;
+                }
+                String assignmentName = (String) JOptionPane.showInputDialog(
+                    this,
+                    "Select an assignment to sort by grade:",
+                    "Sort by Assignment Grade",
+                    JOptionPane.PLAIN_MESSAGE,
+                    null,
+                    allAssignments.toArray(),
+                    allAssignments.get(0)
+                );
+
+                if (assignmentName != null) {
+                    showAssignmentGradesDialog(assignmentName);
+                }
+            } else {
+                updateSortedClasslist(idx);
+            }
+        });
+
+        contentPanel.add(sortOptions, BorderLayout.NORTH);
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
+
+   /**
+    * === CREATES A POP UP FOR SHOW ASSIGNMENT GRADES SORTING ===
+   */
+    private void showAssignmentGradesDialog(String assignmentName) {
+        Course course = controller.getSelectedCourse();
+
+        // 1) Copy & sort the students descending by that assignment’s grade
+        List<Student> sorted = new ArrayList<>();
+        for (Student s : course.getStudents()) {
+            sorted.add(s);
+        }
+        Comparator<Student> byGradeDesc =
+            Student.sortByGradeOnAssignment(assignmentName).reversed();
+        sorted.sort(byGradeDesc);
+
+        // 2) Build the text content
+        StringBuilder sb = new StringBuilder();
+        sb.append("Grades for “").append(assignmentName).append("” in ")
+          .append(course.getName()).append(":\n\n");
+        for (Student s : sorted) {
+            sb.append(s.getFirstName()).append(" ").append(s.getLastName())
+              .append(" – ").append(s.getEmail());
+
+            StudentGradebook gb = s.getGradebookForCourse(course);
+            Assignment a = (gb == null) ? null :
+                gb.getAssignments().stream()
+                  .filter(x -> x.getTitle().equals(assignmentName))
+                  .findFirst().orElse(null);
+
+            if (a != null) {
+                double pct = a.getPointsEarned() / a.getMaxPoints() * 100;
+                sb.append(String.format(" → %.2f%% (%s)", pct, calculateFinalGrade(pct)));
+            } else {
+                sb.append(" → No grade");
+            }
+            sb.append("\n");
+        }
+
+        // 3) Create and style the text area
+        JTextArea ta = new JTextArea(sb.toString());
+        ta.setEditable(false);
+        Font uiFont = UIManager.getFont("Label.font");
+        ta.setFont(uiFont);
+        ta.setLineWrap(true);
+        ta.setWrapStyleWord(true);
+
+        // 4) Wrap in a scroll pane at a reasonable size
+        JScrollPane scroll = new JScrollPane(ta);
+        scroll.setPreferredSize(new Dimension(500, 400));
+
+        // 5) Fire off the modal dialog
+        JOptionPane.showMessageDialog(
+            this,
+            scroll,
+            "Grades for “" + assignmentName + "”",
+            JOptionPane.PLAIN_MESSAGE
+        );
+    }
+
+    
+    /** 
+     * === ONLY NEED ONE UPDATEDSORTEDCLASSLIST HELPER ===
+     * Sorts the in-place classlist by the given option (0–2). */
+    private void updateSortedClasslist(int sortOption) {
+        Course course = controller.getSelectedCourse();
+        StudentList students = new StudentList(course.getStudents());
+
+        switch (sortOption) {
+            case 0: students.sortByFirstName(); break;
+            case 1: students.sortByLastName();  break;
+            case 2: students.sortByUsername();  break;
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Classlist for ").append(course.getName()).append(" (Sorted by grades on \"").append(assignmentName).append("\"):\n\n");
-
-        for (Student student : students) {
-            sb.append(student.getFirstName()).append(" ").append(student.getLastName())
-              .append(" - ").append(student.getEmail()).append("\n");
+        sb.append("Classlist for ").append(course.getName()).append(":\n\n");
+        for (Student s : students) {
+            sb.append(s.getFirstName()).append(" ").append(s.getLastName())
+              .append(" – ").append(s.getEmail()).append("\n");
         }
-
         infoArea.setText(sb.toString());
     }
+    
+    // Helper method to convert percentage to grade
+    private FinalGrades calculateFinalGrade(double percentage) {
+        if (percentage >= 90) return FinalGrades.A;
+        if (percentage >= 80) return FinalGrades.B;
+        if (percentage >= 70) return FinalGrades.C;
+        if (percentage >= 60) return FinalGrades.D;
+        return FinalGrades.E;
+    }
+
 }
