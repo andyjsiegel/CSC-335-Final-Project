@@ -46,17 +46,24 @@ public class Assignment {
         return this.points >= 0;
     }
  
-    public void setGrade(Double grade) {
+    public void setPointsEarned(Double grade) {
     	this.points = grade;
     }
     
-    public double getGrade() {
+    public double getPointsEarned() {
     	return this.points;
     }
 
     public double getMaxPoints() {
         return maxPoints;
-    } 
+    }
+    
+    public double getGrade() {
+        if (this.points < 0) {
+            return -1;
+        }
+        return this.points/this.maxPoints;
+    }
     
     @Override
     public boolean equals(Object obj) {
