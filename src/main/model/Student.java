@@ -3,6 +3,8 @@ package main.model;
 import java.util.ArrayList;
 import java.util.Comparator;
 
+import main.view.CourseDashboard;
+
 public class Student extends User {
 	
     private ArrayList<Course> coursesTaken;
@@ -113,5 +115,22 @@ public class Student extends User {
 
 	public ArrayList<Course> getCourses() {
 		return coursesTaken;
+	}
+
+	public Double getFinalGradeForCourse(CourseDashboard course) {
+		int index = coursesTaken.indexOf(course);
+		if (index != -1) {
+			return gradebooks.get(index).calculateFinalGrade();
+		}
+		return null; // Return null if the course is not found
+	}
+
+	public void setFinalGradeForCourse(CourseDashboard course, String grade) {
+		int index = coursesTaken.indexOf(course);
+		if (index != -1) {
+			gradebooks.get(index).setFinalGrade(Double.parseDouble(grade));
+		} else {
+			System.out.println("Course not found for the student.");
+		}
 	}
 }

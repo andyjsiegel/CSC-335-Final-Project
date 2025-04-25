@@ -104,4 +104,11 @@ public class StudentGradebook {
 		return courseTitle.equals(other.courseTitle) && points == other.points;
 	}
 
+	public Double calculateFinalGrade() {
+		return calculateAverage(); // Returns the calculated average as the final grade
+	}
+
+	public void setFinalGrade(FinalGrades grade) {
+		this.finalGrade = grade; // Updates the final grade based on the new calculated grade
+	}
 }

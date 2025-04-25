@@ -6,8 +6,6 @@ package main.tests;
 import main.model.*;
 import org.junit.jupiter.api.*;
 
-import javax.swing.*;
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 

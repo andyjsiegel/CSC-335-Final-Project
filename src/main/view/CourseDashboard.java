@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import main.controller.UserViewController;
 import main.model.Course;
+import main.model.FinalGrades;
 import main.model.Student;
 import main.model.StudentGradebook;
 import main.model.StudentList;
@@ -21,6 +22,7 @@ public class CourseDashboard extends JPanel {
     private JButton gradeStudentBtn;
     private JButton sideAddAssignmentBtn;
     private JButton addStudentBtn;
+    private JButton setFinalGradesBtn;
     private JPanel contentPanel;
     
     private JButton removeStudentBtn;
@@ -56,6 +58,9 @@ public class CourseDashboard extends JPanel {
 
         gradeStudentBtn = new JButton("Grade a Student!");
         gradeStudentBtn.setVisible(false);
+        
+        setFinalGradesBtn = new JButton("Set Final Grades");
+        setFinalGradesBtn.setVisible(false);
 
         addStudentBtn = new JButton("Add Student");
         addStudentBtn.setVisible(false); // only visible in Classlist view
@@ -70,6 +75,7 @@ public class CourseDashboard extends JPanel {
         rightPanel.add(Box.createVerticalStrut(100));
         rightPanel.add(sideAddAssignmentBtn);
         rightPanel.add(gradeStudentBtn);
+        rightPanel.add(setFinalGradesBtn);
         rightPanel.add(addStudentBtn);
         rightPanel.add(removeStudentBtn);
         rightPanel.add(Box.createVerticalGlue());
@@ -192,7 +198,7 @@ public class CourseDashboard extends JPanel {
 
             sideAddAssignmentBtn.setVisible(false);
             gradeStudentBtn.setVisible(true);
-          
+            setFinalGradesBtn.setVisible(true);
             addStudentBtn.setVisible(false);
 
             Course selectedCourse = controller.getSelectedCourse();
@@ -210,6 +216,7 @@ public class CourseDashboard extends JPanel {
             updateSortedClasslist(0); // default sort by first name
             sideAddAssignmentBtn.setVisible(false);
             gradeStudentBtn.setVisible(false);
+            setFinalGradesBtn.setVisible(false);
             addStudentBtn.setVisible(true);
             classStatsLabel.setVisible(false);  
             removeStudentBtn.setVisible(true);
@@ -276,6 +283,7 @@ public class CourseDashboard extends JPanel {
             
             // set the other clickers to false
             gradeStudentBtn.setVisible(false);
+            setFinalGradesBtn.setVisible(false);
             addStudentBtn.setVisible(false);
             classStatsLabel.setVisible(false);  
             removeStudentBtn.setVisible(false);
@@ -406,6 +414,83 @@ public class CourseDashboard extends JPanel {
                 }
             }
         });
+        
+        setFinalGradesBtn.addActionListener(e -> {
+            Course course1 = controller.getSelectedCourse();
+            StudentList students = course1.getStudents();
+            
+            if (students.isEmpty()) {
+                JOptionPane.showMessageDialog(CourseDashboard.this, "No students in the course to grade.");
+                return;
+            }
+            
+            int count = 0;
+            StringBuilder resultMessage = new StringBuilder("Final grades assigned:\n\n");
+            
+            for (Student student : students) {
+                StudentGradebook gradebook = student.getGradebookForCourse(course1);
+                if (gradebook == null) continue;
+                
+                double totalEarned = 0;
+                double totalPossible = 0;
+                
+                for (Assignment assignment : gradebook.getAssignments()) {
+                    totalEarned += assignment.getPointsEarned();
+                    totalPossible += assignment.getMaxPoints();
+                }
+                
+                if (totalPossible > 0) {
+                    double percentage = (totalEarned / totalPossible) * 100;
+                    FinalGrades grade = calculateFinalGrade(percentage);
+                    gradebook.setFinalGrade(grade);
+                    count++;
+                    
+                    resultMessage.append(student.getFullName())
+                        .append(": ")
+                        .append(String.format("%.2f", percentage))
+                        .append("% - ")
+                        .append(grade)
+                        .append("\n");
+                } else {
+                    resultMessage.append(student.getFullName())
+                        .append(": No assignments to grade\n");
+                }
+            }
+            
+            // Update the display
+            infoArea.setText(getGradesInfo());
+            
+            // Show results
+            if (count > 0) {
+                JTextArea resultArea = new JTextArea(resultMessage.toString());
+                resultArea.setEditable(false);
+                JScrollPane scrollPane1 = new JScrollPane(resultArea);
+                scrollPane1.setPreferredSize(new Dimension(400, 300));
+                
+                JOptionPane.showMessageDialog(
+                    CourseDashboard.this,
+                    scrollPane1,
+                    "Final Grades Set",
+                    JOptionPane.INFORMATION_MESSAGE
+                );
+            } else {
+                JOptionPane.showMessageDialog(
+                    CourseDashboard.this,
+                    "No students had assignments to grade.",
+                    "Final Grades",
+                    JOptionPane.INFORMATION_MESSAGE
+                );
+            }
+        });
+    }
+
+    // Helper method to convert percentage to grade
+    private FinalGrades calculateFinalGrade(double percentage) {
+        if (percentage >= 90) return FinalGrades.A;
+        if (percentage >= 80) return FinalGrades.B;
+        if (percentage >= 70) return FinalGrades.C;
+        if (percentage >= 60) return FinalGrades.D;
+        return FinalGrades.E;
     }
 
     private void updateAssignmentDisplay() {
@@ -487,16 +572,23 @@ public class CourseDashboard extends JPanel {
 
             for (Assignment a : gb.getAssignments()) {
                 sb.append("  ").append(a.getTitle())
-                  .append(" - ").append(a.getPointsEarned ())
+                  .append(" - ").append(a.getPointsEarned())
                   .append("/").append(a.getMaxPoints()).append("\n");
-                totalEarned += a.getPointsEarned ();
+                totalEarned += a.getPointsEarned();
                 totalPossible += a.getMaxPoints();
             }
 
             double percentage = (totalPossible > 0) ? (100 * totalEarned / totalPossible) : 0;
             sb.append("  Total: ").append(String.format("%.2f", totalEarned)).append("/")
               .append(String.format("%.2f", totalPossible))
-              .append(" (").append(String.format("%.2f", percentage)).append("%)\n\n");
+              .append(" (").append(String.format("%.2f", percentage)).append("%)\n");
+              
+            // Add final grade if it exists
+            if (gb.getFinalGrade() != null) {
+                sb.append("  Final Grade: ").append(gb.getFinalGrade()).append("\n");
+            }
+            
+            sb.append("\n");
         }
 
         return sb.toString();
@@ -520,5 +612,4 @@ public class CourseDashboard extends JPanel {
 
         infoArea.setText(sb.toString());
     }
-
 }
