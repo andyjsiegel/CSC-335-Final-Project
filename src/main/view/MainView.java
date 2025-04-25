@@ -61,10 +61,10 @@ public class MainView extends JFrame {
         addAssignmentButton.addActionListener(e -> showListViewClassesPanel());
 
         JButton viewCalendarButton = new JButton("View Calendar");
-        viewCalendarButton.addActionListener(e -> showCalendarPanel());
+        //viewCalendarButton.addActionListener(e -> showCalendarPanel());
 
         //JButton testing = new JButton("testing");
-        //testing.addActionListener(e -> showTestingPanel());
+        //testing.addActionListener(_ -> showTestingPanel());
         
         if(controller.getUser() instanceof Instructor) bottomPanel.add(addClassButton);
         bottomPanel.add(addAssignmentButton);

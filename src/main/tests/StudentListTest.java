@@ -4,8 +4,6 @@ import org.junit.jupiter.api.*;
 
 import main.model.*;
 
-import java.util.*;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 // StudentListTest

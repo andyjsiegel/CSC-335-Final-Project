@@ -7,7 +7,6 @@ import main.model.StudentList;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 
 public class ClassDetailsView extends JFrame {
 

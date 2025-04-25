@@ -1,36 +1,70 @@
 package main.tests;
 
-import static org.junit.jupiter.api.Assertions.*;
+import main.model.*;            // :contentReference[oaicite:2]{index=2}&#8203;:contentReference[oaicite:3]{index=3}
+import main.util.*;
 import org.junit.jupiter.api.Test;
-import main.model.Student;
-import main.util.CSVImporter;
-import java.io.*;
-import java.nio.file.*;
+import org.junit.jupiter.api.io.TempDir;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-public class CSVImporterTest {
+import static org.junit.jupiter.api.Assertions.*;
+
+class CSVImporterTest {
+
+    @TempDir
+    Path tempDir;
+
     @Test
-    public void testImportStudents() throws IOException {
-        // Create a temporary CSV file with sample student data.
-        Path tempFile = Files.createTempFile("students", ".csv");
-        try (BufferedWriter writer = Files.newBufferedWriter(tempFile)) {
-            // CSV format: username,password,name,role.
-            writer.write("john_doe,password123,John Doe,Student\n");
-            writer.write("jane_doe,password456,Jane Doe,Student\n");
-            writer.write("prof_smith,password789,Prof. Smith,Instructor\n");
-        }
+    void testImportStudentsFiltersByRoleAndTrimsWhitespace() throws IOException {
+        // Prepare a CSV with mixed roles and varying case/whitespace
+        List<String> lines = List.of(
+            "  alice  ,  pwA  ,  Alice  ,  Adams  , alice@x.com  ,  Student  ",
+            "bob,bobPw,Bob,Baker,bob@x.com,Instructor",
+            "carol, pwC , Carol , Carter , carol@x.com , student",
+            "dan,danPw,Dan,Donovan,dan@x.com,OTHER",
+            "eve,evePw,Eve,Evans,eve@x.com,STUDENT"
+        );
 
-        // Import students using the CSVImporter.
-        List<Student> students = CSVImporter.importStudents(tempFile.toString());
-        // Only two students should be imported (role "Student" only).
-        assertEquals(2, students.size(), "CSVImporter should import 2 students");
+        // Write to temp file
+        Path csv = tempDir.resolve("students.csv");
+        Files.write(csv, lines);
 
-        // Verify the first student's username.
-        Student student1 = students.get(0);
-        assertEquals("john_doe", student1.getUsername(), "First student's username should be 'john_doe'");
+        // Run importer
+        List<Student> students = CSVImporter.importStudents(csv.toString());
 
-        // Clean up the temporary file.
-        Files.deleteIfExists(tempFile);
+        // We expect exactly alice, carol, and eve
+        assertEquals(3, students.size(), "Only 3 Student entries should be imported");
+
+        // Index by username for easy lookup
+        Map<String, Student> byUsername = students.stream()
+            .collect(Collectors.toMap(Student::getUsername, s -> s));
+
+        // alice
+        Student alice = byUsername.get("alice");
+        assertNotNull(alice, "alice should be present");
+        assertEquals("Alice",  alice.getFirstName());
+        assertEquals("Adams",  alice.getLastName());
+        assertEquals("alice@x.com", alice.getEmail());
+        // Since importer sets isHashed=true, the password field is stored verbatim
+        assertEquals("pwA", alice.getHashedPassword());
+
+        // carol (lowercase “student”)
+        Student carol = byUsername.get("carol");
+        assertNotNull(carol, "carol should be present");
+        assertEquals("Carol", carol.getFirstName());
+        assertEquals("Carter", carol.getLastName());
+        assertEquals("pwC",   carol.getHashedPassword());
+
+        // eve (uppercase “STUDENT”)
+        Student eve = byUsername.get("eve");
+        assertNotNull(eve, "eve should be present");
+        assertEquals("Eve",   eve.getFirstName());
+        assertEquals("Evans", eve.getLastName());
+        assertEquals("evePw", eve.getHashedPassword());
     }
 }
-

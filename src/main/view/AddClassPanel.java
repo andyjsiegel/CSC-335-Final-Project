@@ -3,27 +3,22 @@ package main.view;
 import javax.swing.*;
 
 import main.controller.UserViewController;
-import main.model.Days;
 import main.model.User;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.List;
 
 public class AddClassPanel extends JPanel {
 
-    private User user;
     private UserViewController controller;
 
     private JTextField classNameField;
-    private JTextField creditsField;
     private JTextField classCodeField;
     private JTextArea descriptionArea;
     private JCheckBox[] dayCheckboxes;
     private JButton submitButton;
 
     public AddClassPanel(User user, UserViewController controller) {
-        this.user = user;
         this.controller = controller; // Use the one passed in
 
 
@@ -41,12 +36,6 @@ public class AddClassPanel extends JPanel {
         formPanel.add(new JLabel("Class Code:"));
         classCodeField = new JTextField();
         formPanel.add(classCodeField);
-
-        // Credits
-        
-        formPanel.add(new JLabel("Credits:"));
-        creditsField = new NumberField();
-        formPanel.add(creditsField);
         
         // Description
         formPanel.add(new JLabel("Description:"));
@@ -78,7 +67,6 @@ public class AddClassPanel extends JPanel {
         String className = classNameField.getText();
         String classCode = classCodeField.getText();
         String description = descriptionArea.getText();
-        String credits = creditsField.getText();
 
         ArrayList<String> selectedDays = new ArrayList<>();
 
@@ -95,7 +83,7 @@ public class AddClassPanel extends JPanel {
             }
         }
 
-        controller.addCourse(className, classCode, credits, description, selectedDays);
+        controller.addCourse(className, classCode, description, selectedDays);
 
         System.out.println("Class Name: " + className);
         System.out.println("Description: " + description);

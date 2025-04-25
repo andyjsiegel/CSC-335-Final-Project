@@ -2,11 +2,8 @@ package main.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.Arrays;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,7 +12,6 @@ import main.view.NumberField;
 public class Course {
     private String code;
     private String name;
-    private String credits;
     private String description;
     private Instructor instructor;
     private ArrayList<Days> daysOfWeek;
@@ -26,12 +22,11 @@ public class Course {
     private HashMap<String, JLabel> assignmentLabels = new HashMap<String, JLabel>();
 
     
-    public Course(String name, String code, String credits, String description,
+    public Course(String name, String code, String description,
                   Instructor instructor, ArrayList<Days> daysOfWeek) {
         
         this.name = name;
         this.code = code;
-        this.credits = credits;
         
     	this.description = description;
         this.instructor = instructor;
@@ -76,7 +71,7 @@ public class Course {
 
         JButton addButton = new JButton("Add Selected Students");
         addStudentsPanel.add(addButton);
-        addButton.addActionListener(_ -> {
+        addButton.addActionListener(e -> {
             for(int i = 0; i < tempStudents.size(); i++) {
                 if(tempCheckboxes.get(i).isSelected()) {
                     this.studentList.add(tempStudents.get(i));
@@ -88,21 +83,72 @@ public class Course {
     }
 
     public void setDefaultCategories() {
-        // new Category(name, points, expPointsPerAssignment)
+        // Create default categories without adding assignments
         Category homeworks = new Category("Homeworks", 250, 25);
-        homeworks.addDefaultAssignments();
         categories.put("Homeworks", homeworks);
         Category projects = new Category("Projects", 250, 50);
-        projects.addDefaultAssignments();
         categories.put("Projects", projects);
         Category midtermExam = new Category("Midterm Exam", 250, 250);
-        midtermExam.addDefaultAssignments();
         categories.put("Midterm Exam", midtermExam);
         Category finalExam = new Category("Final Exam", 250, 250);
-        finalExam.addDefaultAssignments();
         categories.put("Final Exam", finalExam);
     }
-
+    
+    public void promptAddAssignment() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+    
+        JLabel titleLabel = new JLabel("Assignment Title:");
+        JTextField titleField = new JTextField(20);
+        panel.add(titleLabel);
+        panel.add(titleField);
+    
+        JLabel descriptionLabel = new JLabel("Description:");
+        JTextArea descriptionField = new JTextArea(5, 20);
+        descriptionField.setLineWrap(true);
+        descriptionField.setWrapStyleWord(true);
+        panel.add(descriptionLabel);
+        panel.add(new JScrollPane(descriptionField));
+    
+        JLabel categoryLabel = new JLabel("Category:");
+        JComboBox<String> categoryField = new JComboBox<>(categories.keySet().toArray(new String[0]));
+        panel.add(categoryLabel);
+        panel.add(categoryField);
+    
+        JLabel maxPointsLabel = new JLabel("Max Points:");
+        JTextField maxPointsField = new JTextField(5);
+        panel.add(maxPointsLabel);
+        panel.add(maxPointsField);
+    
+        int result = JOptionPane.showConfirmDialog(null, panel, "Add Assignment", JOptionPane.OK_CANCEL_OPTION);
+        if (result == JOptionPane.OK_OPTION) {
+            String title = titleField.getText();
+            String description = descriptionField.getText();
+            String category = (String) categoryField.getSelectedItem();
+            int maxPoints;
+            try {
+                maxPoints = Integer.parseInt(maxPointsField.getText());
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Invalid max points value. Please enter a valid number.");
+                return;
+            }
+    
+            Assignment assignment = new Assignment(title, description, maxPoints);
+            categories.get(category).addAssignment(assignment);
+            this.addAssignment(assignment);
+    
+            // Add the assignment to all students
+            for (Student student : studentList) {
+                student.getGradebookForCourse(this).addAssignment(new Assignment(assignment));
+            }
+    
+            JOptionPane.showMessageDialog(null, "Assignment added successfully!");
+        }
+    }
+      
+    public HashMap<String, Category> getCategories(){
+    	return this.categories;
+    }
     public CourseAssignments getAssignments() {
         return assignments;
     }
@@ -184,7 +230,7 @@ public class Course {
         maxPointsField.setText(categories.get(categoryField.getSelectedItem().toString()).getExpectedPoints() + "");
         panel.add(maxPointsField);
 
-        categoryField.addActionListener(_ -> {
+        categoryField.addActionListener(e -> {
             String selectedCategory = (String) categoryField.getSelectedItem();
             maxPointsField.setText(categories.get(selectedCategory).getExpectedPoints() + "");
         });
@@ -206,7 +252,7 @@ public class Course {
         return panel;
     }
     
-    public JTabbedPane getCourseView(boolean isInstructor) {
+    public JTabbedPane getCourseView(User user) {
         // Main panel with course details
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
@@ -224,37 +270,23 @@ public class Course {
         panel.setOpaque(false);
     
         JLabel emptyLabel = new JLabel("");
-        gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.gridwidth = 2;
-        gbc.insets = new Insets(5, 10, 5, 10);
-        gbc.anchor = GridBagConstraints.WEST;
         panel.add(emptyLabel, gbc);
     
         JLabel instructorLabel = new JLabel("Instructors:");
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.gridwidth = 1;
-        gbc.insets = new Insets(5, 10, 5, 10);
-        gbc.anchor = GridBagConstraints.WEST;
         panel.add(instructorLabel, gbc);
     
-        //for (Instructor instructor : instructors) {
-            JLabel instructorName = new JLabel(instructor.getFullName());
-            gbc.gridx = 1;
-            gbc.gridy = 2;
-            gbc.gridwidth = 1;
-            gbc.insets = new Insets(5, 10, 5, 10);
-            gbc.anchor = GridBagConstraints.WEST;
-            panel.add(instructorName, gbc);
-        //}
+        JLabel instructorName = new JLabel(instructor.getFullName());
+        gbc.gridx = 1;
+        panel.add(instructorName, gbc);
     
         JLabel categoryLabel = new JLabel("Category Weights:");
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 2;
-        gbc.insets = new Insets(5, 10, 5, 10);
-        gbc.anchor = GridBagConstraints.WEST;
         panel.add(categoryLabel, gbc);
     
         int gridYIterator = 4;
@@ -263,122 +295,46 @@ public class Course {
             gbc.gridx = 0;
             gbc.gridy = gridYIterator;
             gbc.gridwidth = 1;
-            gbc.insets = new Insets(5, 10, 5, 10);
-            gbc.anchor = GridBagConstraints.WEST;
             panel.add(categoryName, gbc);
     
-            JLabel categoryWeight = new JLabel(String.valueOf(categories.get(category).getPoints()) + " pts");
+            JLabel categoryWeight = new JLabel(categories.get(category).getPoints() + " pts");
             gbc.gridx = 1;
-            gbc.gridy = gridYIterator;
-            gbc.gridwidth = 1;
-            gbc.insets = new Insets(5, 10, 5, 10);
-            gbc.anchor = GridBagConstraints.WEST;
             panel.add(categoryWeight, gbc);
             gridYIterator++;
         }
     
-        // Create tabbed pane and add course detail panel as one tab
+        // Create tabbed pane and add course info panel
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Course Info", panel);
     
+        // Assignments Panel
         JPanel assignmentsPanel = new JPanel();
         assignmentsPanel.setLayout(new BoxLayout(assignmentsPanel, BoxLayout.Y_AXIS));
-        
+    
         JButton addAssignmentButton = new JButton("Add Assignment");
-        addAssignmentButton.addActionListener(_ -> {
+        addAssignmentButton.addActionListener(e -> {
             JOptionPane.showMessageDialog(null, this.getAssignmentAddPanel(), this.getCourseCode(), JOptionPane.PLAIN_MESSAGE);
         });
         assignmentsPanel.add(addAssignmentButton);
-        // keep a list of JCheckboxes and assignmentLabels in order
-        ArrayList<JCheckBox> studentCheckboxes = new ArrayList<JCheckBox>();
-
-        ArrayList<String> categoryTitles = new ArrayList<String>(categories.keySet());
-        Collections.sort(categoryTitles);
-        for (String category : categoryTitles) {
-            ArrayList<Assignment> assignments = categories.get(category).getAssignments();
-
-            // Header button for collapsible section
-            JToggleButton toggleButton = new JToggleButton(category + " [" + categories.get(category).getPoints() + " pts]");
-            toggleButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-            // Panel to hold assignments for this category
-            JPanel assignmentsListPanel = new JPanel();
-            JLabel assignmentsGraded = new JLabel();
-            assignmentsGraded.setBorder(BorderFactory.createEmptyBorder(2, 20, 2, 2));
-            assignmentsListPanel.setLayout(new BoxLayout(assignmentsListPanel, BoxLayout.Y_AXIS));
-            assignmentsListPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-            if(!isInstructor) assignmentsListPanel.add(assignmentsGraded);
-
-            // Add each assignment as a label or more complex component
-            int numGraded = 0;
-            int pointsEarned = 0;
-            int pointsPossible = categories.get(category).getPoints();
-            for (Assignment assignment : assignments) {
-                // assignment.setGradeTo100();
-                if(assignment.isGraded()) {
-                    pointsEarned += assignment.getGrade();
-                    numGraded++;
-                }
-                JLabel assignmentLabel = new JLabel(assignment.getTitle() + " : " + (assignment.isGraded() ? assignment.getGrade() + "/" + assignment.getMaxPoints() : "--/" + assignment.getMaxPoints()));
-                assignmentLabels.put(assignment.getTitle(), assignmentLabel);
-                assignmentLabel.setBorder(BorderFactory.createEmptyBorder(2, 20, 2, 2));
-                assignmentsListPanel.add(assignmentLabel);
-                JButton gradeAssignmentButton = new JButton("Grade");
-                gradeAssignmentButton.addActionListener(_ -> {
-                    String grade = JOptionPane.showInputDialog("How many points did the selected users get?"); 
-                    double gradeEarned = Double.parseDouble(grade);
-                    for(int i = 0; i < studentCheckboxes.size(); i++) {
-                        JCheckBox checkbox = studentCheckboxes.get(i);
-                        if(checkbox.isSelected()) {
-                            Student student = this.getStudents().get(i);
-                            student.getGradebookForCourse(this).addAssignment(new Assignment(assignment), gradeEarned);
-                            System.out.println("Set grade for assignment " + assignment + " for student " + student.getFullName() + " with grade " + gradeEarned);
-                        }
-                    }
-                    updateAssignmentLabels(assignment.getTitle());
-                });
-                if(isInstructor) {
-                    assignmentsListPanel.add(gradeAssignmentButton);
-                }
-            }
-            
-            assignmentsGraded.setText(numGraded + "/" + assignments.size() + " " + category + " graded" + ": " + pointsEarned + "/" + pointsPossible + " points earned");
-            // Initially collapsed
-            assignmentsListPanel.setVisible(false);
-
-            // Toggle visibility on button click
-            toggleButton.addActionListener(e -> {
-                assignmentsListPanel.setVisible(toggleButton.isSelected());
-                // Revalidate and repaint to update UI
-                assignmentsPanel.revalidate();
-                assignmentsPanel.repaint();
-            });
-
-            // Add header and assignments list to main assignments panel
-            assignmentsPanel.add(toggleButton);
-            assignmentsPanel.add(assignmentsListPanel);
-        }
-
+    
+        // Classlist Panel
         JPanel classListPanel = new JPanel();
-        if(studentList.isEmpty()) {
+        classListPanel.setLayout(new GridLayout(Math.max(studentList.size(), 1), 1));
+        if (studentList.isEmpty()) {
             classListPanel.add(new JLabel("No students enrolled."));
+        } else {
+            for (Student student : studentList) {
+                classListPanel.add(new JLabel(student.getFirstName() + " " + student.getLastName()));
+            }
         }
-        classListPanel.setLayout(new GridLayout(studentList.size(), 2));
-        for(Student student : studentList) {
-            classListPanel.add(new JLabel(student.getFirstName() + " " + student.getLastName()));
-            if(isInstructor) {
-                JCheckBox checkbox = new JCheckBox();
-                studentCheckboxes.add(checkbox);
-                classListPanel.add(checkbox);
-            } 
-        }
-
-        // Wrap assignmentsPanel in a JScrollPane in case of many assignments/categories
+    
+        // Wrap assignmentsPanel in scroll pane
         JScrollPane scrollPane = new JScrollPane(assignmentsPanel);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
+    
         tabbedPane.addTab("Assignments", scrollPane);
         tabbedPane.addTab("Classlist", new JScrollPane(classListPanel));
-
+    
         return tabbedPane;
     }
 
@@ -400,10 +356,10 @@ public class Course {
         ArrayList<Assignment> assignments = getAssignmentsByName(assignmentName);
         List<Assignment> gradedAssignments = assignments.stream().filter(assignment -> assignment.isGraded()).collect(Collectors.toList());
         System.out.println(gradedAssignments.size());
-        double mean = gradedAssignments.stream().mapToDouble(Assignment::getGrade)
+        double mean = gradedAssignments.stream().mapToDouble(Assignment::getPointsEarned)
             .average()
             .orElse(0.0); 
-        double median = gradedAssignments.stream().mapToDouble(Assignment::getGrade)
+        double median = gradedAssignments.stream().mapToDouble(Assignment::getPointsEarned)
             .sorted()
             .boxed()
             .collect(Collectors.toList())

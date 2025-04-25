@@ -16,7 +16,7 @@ class InstructorTest {
     @BeforeEach
     void setup() {
         inst = new Instructor("u","p","I","N","e",false);
-        c = new Course("Name","C1","3","Desc",inst,new ArrayList<>());
+        c = new Course("Name","C1","Desc",inst,new ArrayList<>());
     }
 
     @Test

@@ -3,6 +3,8 @@ package main.model;
 import java.util.ArrayList;
 import java.util.Comparator;
 
+import main.view.CourseDashboard;
+
 public class Student extends User {
 	
     private ArrayList<Course> coursesTaken;
@@ -18,6 +20,14 @@ public class Student extends User {
     public Student(Student other) {
         super(other.username, other.password, other.firstName, other.lastName, other.email,true);
     }
+
+	public ArrayList<Assignment> getAllAssignments() {
+		ArrayList<Assignment> studentAssignments = new ArrayList<Assignment>();
+		for (StudentGradebook gradebook : gradebooks) {
+			studentAssignments.addAll(gradebook.getAssignments());
+		}
+		return studentAssignments;
+	}
 
 	public StudentGradebook getGradebookForCourse(Course course) {
 		return gradebooks.get(coursesTaken.indexOf(course));
@@ -57,6 +67,32 @@ public class Student extends User {
 		};
 	}
 
+	public static Comparator<Student> sortByGradeOnAssignment(String assignmentName) {
+	    return new Comparator<Student>() {
+	        @Override
+	        public int compare(Student s1, Student s2) {
+	            Assignment a1 = s1.getAssignmentByName(assignmentName);
+	            Assignment a2 = s2.getAssignmentByName(assignmentName);
+	            // -1 is students withotu grades 
+	            double grade1 = (a1 != null) ? a1.getGrade() : -1.0; 
+	            double grade2 = (a2 != null) ? a2.getGrade() : -1.0;
+
+	            return Double.compare(grade1, grade2);
+	        }
+	    };
+	}
+
+	
+
+	public Assignment getAssignmentByName(String assignmentName) {
+		for (Assignment assignment : getAllAssignments()) {
+			if (assignment.getTitle().equals(assignmentName)) {
+				return assignment;
+			}
+		}
+		return null;
+	}
+
 	public String getFullName() {
 		return this.firstName + " " + this.lastName;
 	}
@@ -79,5 +115,22 @@ public class Student extends User {
 
 	public ArrayList<Course> getCourses() {
 		return coursesTaken;
+	}
+
+	public Double getFinalGradeForCourse(CourseDashboard course) {
+		int index = coursesTaken.indexOf(course);
+		if (index != -1) {
+			return gradebooks.get(index).calculateFinalGrade();
+		}
+		return null; // Return null if the course is not found
+	}
+
+	public void setFinalGradeForCourse(CourseDashboard course, String grade) {
+		int index = coursesTaken.indexOf(course);
+		if (index != -1) {
+			gradebooks.get(index).setFinalGrade(Double.parseDouble(grade));
+		} else {
+			System.out.println("Course not found for the student.");
+		}
 	}
 }
