@@ -72,7 +72,7 @@ public class Course {
 
         JButton addButton = new JButton("Add Selected Students");
         addStudentsPanel.add(addButton);
-        addButton.addActionListener(_ -> {
+        addButton.addActionListener(e -> {
             for(int i = 0; i < tempStudents.size(); i++) {
                 if(tempCheckboxes.get(i).isSelected()) {
                     this.studentList.add(tempStudents.get(i));
@@ -84,20 +84,69 @@ public class Course {
     }
 
     public void setDefaultCategories() {
-        // new Category(name, points, expPointsPerAssignment)
+        // Create default categories without adding assignments
         Category homeworks = new Category("Homeworks", 250, 25);
-        homeworks.addDefaultAssignments();
         categories.put("Homeworks", homeworks);
         Category projects = new Category("Projects", 250, 50);
-        projects.addDefaultAssignments();
         categories.put("Projects", projects);
         Category midtermExam = new Category("Midterm Exam", 250, 250);
-        midtermExam.addDefaultAssignments();
         categories.put("Midterm Exam", midtermExam);
         Category finalExam = new Category("Final Exam", 250, 250);
-        finalExam.addDefaultAssignments();
         categories.put("Final Exam", finalExam);
     }
+    
+    public void promptAddAssignment() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+    
+        JLabel titleLabel = new JLabel("Assignment Title:");
+        JTextField titleField = new JTextField(20);
+        panel.add(titleLabel);
+        panel.add(titleField);
+    
+        JLabel descriptionLabel = new JLabel("Description:");
+        JTextArea descriptionField = new JTextArea(5, 20);
+        descriptionField.setLineWrap(true);
+        descriptionField.setWrapStyleWord(true);
+        panel.add(descriptionLabel);
+        panel.add(new JScrollPane(descriptionField));
+    
+        JLabel categoryLabel = new JLabel("Category:");
+        JComboBox<String> categoryField = new JComboBox<>(categories.keySet().toArray(new String[0]));
+        panel.add(categoryLabel);
+        panel.add(categoryField);
+    
+        JLabel maxPointsLabel = new JLabel("Max Points:");
+        JTextField maxPointsField = new JTextField(5);
+        panel.add(maxPointsLabel);
+        panel.add(maxPointsField);
+    
+        int result = JOptionPane.showConfirmDialog(null, panel, "Add Assignment", JOptionPane.OK_CANCEL_OPTION);
+        if (result == JOptionPane.OK_OPTION) {
+            String title = titleField.getText();
+            String description = descriptionField.getText();
+            String category = (String) categoryField.getSelectedItem();
+            int maxPoints;
+            try {
+                maxPoints = Integer.parseInt(maxPointsField.getText());
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Invalid max points value. Please enter a valid number.");
+                return;
+            }
+    
+            Assignment assignment = new Assignment(title, description, maxPoints);
+            categories.get(category).addAssignment(assignment);
+            this.addAssignment(assignment);
+    
+            // Add the assignment to all students
+            for (Student student : studentList) {
+                student.getGradebookForCourse(this).addAssignment(new Assignment(assignment));
+            }
+    
+            JOptionPane.showMessageDialog(null, "Assignment added successfully!");
+        }
+    }
+    
 
     
     public HashMap<String, Category> getCategories(){
@@ -184,13 +233,13 @@ public class Course {
         maxPointsField.setText(categories.get(categoryField.getSelectedItem().toString()).getExpectedPoints() + "");
         panel.add(maxPointsField);
 
-        categoryField.addActionListener(_ -> {
+        categoryField.addActionListener(e -> {
             String selectedCategory = (String) categoryField.getSelectedItem();
             maxPointsField.setText(categories.get(selectedCategory).getExpectedPoints() + "");
         });
 
         JButton addButton = new JButton("Add");
-        addButton.addActionListener(_ -> {
+        addButton.addActionListener(e -> {
             String title = titleField.getText();
             String description = descriptionField.getText();
             String category = categoryField.getSelectedItem().toString();
@@ -285,7 +334,7 @@ public class Course {
         assignmentsPanel.setLayout(new BoxLayout(assignmentsPanel, BoxLayout.Y_AXIS));
         
         JButton addAssignmentButton = new JButton("Add Assignment");
-        addAssignmentButton.addActionListener(_ -> {
+        addAssignmentButton.addActionListener(e -> {
             JOptionPane.showMessageDialog(null, this.getAssignmentAddPanel(), this.getCourseCode(), JOptionPane.PLAIN_MESSAGE);
         });
         assignmentsPanel.add(addAssignmentButton);
@@ -324,7 +373,7 @@ public class Course {
                 assignmentLabel.setBorder(BorderFactory.createEmptyBorder(2, 20, 2, 2));
                 assignmentsListPanel.add(assignmentLabel);
                 JButton gradeAssignmentButton = new JButton("Grade");
-                gradeAssignmentButton.addActionListener(_ -> {
+                gradeAssignmentButton.addActionListener(e -> {
                     String grade = JOptionPane.showInputDialog("How many points did the selected users get?"); 
                     double gradeEarned = Double.parseDouble(grade);
                     for(int i = 0; i < studentCheckboxes.size(); i++) {
@@ -347,7 +396,7 @@ public class Course {
             assignmentsListPanel.setVisible(false);
 
             // Toggle visibility on button click
-            toggleButton.addActionListener(_ -> {
+            toggleButton.addActionListener(e -> {
                 assignmentsListPanel.setVisible(toggleButton.isSelected());
                 // Revalidate and repaint to update UI
                 assignmentsPanel.revalidate();

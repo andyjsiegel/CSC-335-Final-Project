@@ -128,7 +128,7 @@ public class RegisterScreen extends JFrame {
 
         ColoredButton registerButton = new ColoredButton("Register");
 
-        registerButton.addActionListener(_ -> {
+        registerButton.addActionListener(e -> {
             Boolean isInstructor = null;
             if (instructorCheckBox.isSelected()) {
                 isInstructor = true;

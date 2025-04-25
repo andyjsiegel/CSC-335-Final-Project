@@ -28,6 +28,10 @@ public class StudentGradebook {
 		this.courseAssignments.add(assignment);
 		this.points += grade;
 	}
+
+	public void addAssignment(Assignment assignment) {
+		this.courseAssignments.add(assignment);
+	}
 	
 	public double calculateAverage() {
 		int maxPoints = 0;

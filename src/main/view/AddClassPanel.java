@@ -57,7 +57,7 @@ public class AddClassPanel extends JPanel {
 
         // Submit Button
         submitButton = new JButton("Submit");
-        submitButton.addActionListener(_ -> handleSubmit());
+        submitButton.addActionListener(e -> handleSubmit());
         formPanel.add(submitButton);
 
         add(formPanel, BorderLayout.NORTH);

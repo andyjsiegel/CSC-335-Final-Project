@@ -67,7 +67,7 @@ public class LoginScreen extends JFrame {
         passwordField.setFont(font);
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        passwordField.addActionListener(_ -> {
+        passwordField.addActionListener(e -> {
             String username = usernameField.getText();
             String password = new String(passwordField.getPassword());
             loginController.login(username, password);
@@ -85,7 +85,7 @@ public class LoginScreen extends JFrame {
 
         // Login button
         ColoredButton loginButton = new ColoredButton("Login");
-        loginButton.addActionListener(_ -> {
+        loginButton.addActionListener(e -> {
             String username = usernameField.getText();
             String password = new String(passwordField.getPassword());
             loginController.login(username, password);
@@ -99,7 +99,7 @@ public class LoginScreen extends JFrame {
 
         // Register button
         ColoredButton registerButton = new ColoredButton("Register");
-        registerButton.addActionListener(_ -> {
+        registerButton.addActionListener(e -> {
             new RegisterScreen(loginController);
             this.dispose();
         });
