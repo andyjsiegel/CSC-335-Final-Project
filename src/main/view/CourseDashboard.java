@@ -5,6 +5,7 @@ import main.model.Assignment;
 
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import main.controller.UserViewController;
 import main.model.Course;
@@ -17,10 +18,14 @@ public class CourseDashboard extends JPanel {
     private CardLayout cardLayout;
     private JPanel cardPanel;
     private JTextArea infoArea;
-    private JButton cookieBtn;
+    private JButton gradeStudentBtn;
     private JButton sideAddAssignmentBtn;
     private JButton addStudentBtn;
     private JPanel contentPanel;
+    
+    private JButton removeStudentBtn;
+    private JLabel classStatsLabel;
+
     
     private UserViewController controller;
 
@@ -49,12 +54,14 @@ public class CourseDashboard extends JPanel {
         sideAddAssignmentBtn = new JButton("Add Assignment");
         sideAddAssignmentBtn.setVisible(false);
 
-        cookieBtn = new JButton("Grade a srduent!");
-        cookieBtn.setVisible(false);
+        gradeStudentBtn = new JButton("Grade a Student!");
+        gradeStudentBtn.setVisible(false);
 
         addStudentBtn = new JButton("Add Student");
         addStudentBtn.setVisible(false); // only visible in Classlist view
 
+        removeStudentBtn = new JButton("Remove Student");
+        removeStudentBtn.setVisible(false);  // only show on Classlist view
 
         
         JPanel rightPanel = new JPanel();
@@ -62,8 +69,9 @@ public class CourseDashboard extends JPanel {
         
         rightPanel.add(Box.createVerticalStrut(100));
         rightPanel.add(sideAddAssignmentBtn);
-        rightPanel.add(cookieBtn);
+        rightPanel.add(gradeStudentBtn);
         rightPanel.add(addStudentBtn);
+        rightPanel.add(removeStudentBtn);
         rightPanel.add(Box.createVerticalGlue());
 
 
@@ -149,7 +157,7 @@ public class CourseDashboard extends JPanel {
         JPanel mainButtonPanel = new JPanel();
         JButton addAssignmentBtn = new JButton("Assignments");
         JButton addClasslistBtn = new JButton("Classlist");
-        JButton viewGradesBtn = new JButton("grades?");
+        JButton viewGradesBtn = new JButton("Grades");
         mainButtonPanel.add(addAssignmentBtn);
         mainButtonPanel.add(addClasslistBtn);
         mainButtonPanel.add(viewGradesBtn);
@@ -162,53 +170,155 @@ public class CourseDashboard extends JPanel {
 
         mainViewPanel.add(topContainer, BorderLayout.NORTH);
 
+        // show the class average and class mean
+        classStatsLabel = new JLabel("Class Average: --   Median: --");
+        classStatsLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        classStatsLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        classStatsLabel.setVisible(false);  // initially hidden
+
+        topContainer.add(classStatsLabel); // or wherever you stack layout it
+
+
+        
         // === Add only the main panel to cardPanel ===
         cardPanel.add(mainViewPanel, "main");
         cardLayout.show(cardPanel, "main");
 
         add(cardPanel, BorderLayout.CENTER);
 
-        // === BUTTON LOGIC === (it will be placeholder for adding students and assignemnts, just testing
-        // how it would look like)
-
-        viewGradesBtn.addActionListener(_ -> {
+        
+        viewGradesBtn.addActionListener(e -> {
             infoArea.setText(getGradesInfo());
+
             sideAddAssignmentBtn.setVisible(false);
-            cookieBtn.setVisible(true);
+            gradeStudentBtn.setVisible(true);
+          
             addStudentBtn.setVisible(false);
 
-        });
-
-        addClasslistBtn.addActionListener(_ -> {
-            infoArea.setText(getClasslistInfo());
-            sideAddAssignmentBtn.setVisible(false);
-            cookieBtn.setVisible(false);
-            addStudentBtn.setVisible(true);
-
-        });
-
-        addAssignmentBtn.addActionListener(_ -> {
             Course selectedCourse = controller.getSelectedCourse();
+            StudentList classlist = selectedCourse.getStudents();
+            double avg = classlist.getClassAverage(selectedCourse);
+            double median = classlist.getClassMedian(selectedCourse);
 
-            // STEP 1: Show existing assignments in infoArea
+            classStatsLabel.setText(String.format("Class Average: %.2f%%   Median: %.2f%%", avg, median));
+            classStatsLabel.setVisible(true);  
+            removeStudentBtn.setVisible(false);
+
+        });
+        
+        addClasslistBtn.addActionListener(e -> {
+            updateSortedClasslist(0); // default sort by first name
+            sideAddAssignmentBtn.setVisible(false);
+            gradeStudentBtn.setVisible(false);
+            addStudentBtn.setVisible(true);
+            classStatsLabel.setVisible(false);  
+            removeStudentBtn.setVisible(true);
+
+            // === SORT DROPDOWN ===
+            JComboBox<String> sortOptions = new JComboBox<>(new String[] {
+                "Sort by First Name", "Sort by Last Name", "Sort by Username", "Sort by grades on an assignment"
+            });
+
+            sortOptions.addActionListener(e2 -> {
+                int selectedIndex = sortOptions.getSelectedIndex();
+                if (selectedIndex == 3) { // Sort by grades on an assignment
+                
+                    ArrayList<String> allAssignments = new ArrayList<>();
+
+                    for (String category : controller.getSelectedCourse().getCategories().keySet()) {
+                        for (Assignment a : controller.getSelectedCourse().getCategories().get(category).getAssignments()) {
+                            allAssignments.add(a.getTitle());
+                        }
+                    }
+
+                    if (allAssignments.isEmpty()) {
+                        JOptionPane.showMessageDialog(this, "No assignments found to sort by.");
+                        return;
+                    }
+
+                    String assignmentName = (String) JOptionPane.showInputDialog(
+                        this,
+                        "Select an assignment to sort by grade:",
+                        "Sort by Assignment Grade",
+                        JOptionPane.PLAIN_MESSAGE,
+                        null,
+                        allAssignments.toArray(),
+                        allAssignments.get(0)
+                    );
+
+                    if (assignmentName != null) {
+                        updateSortedClasslist(3, assignmentName); 
+                    }
+
+                } else {
+                    updateSortedClasslist(selectedIndex);
+                }
+            });
+
+
+            // remove existing dropdowns and add the new one
+            for (Component comp : contentPanel.getComponents()) {
+                if (comp instanceof JComboBox) {
+                    contentPanel.remove(comp);
+                }
+            }
+            contentPanel.add(sortOptions, BorderLayout.NORTH);
+            contentPanel.revalidate();
+            contentPanel.repaint();
+        });
+
+
+        addAssignmentBtn.addActionListener(e -> {
             updateAssignmentDisplay();
             sideAddAssignmentBtn.setVisible(true);
 
-            // Show assignment creation form
-            JPanel assignmentPanel = selectedCourse.getAssignmentAddPanel();
+            JPanel assignmentPanel = controller.getSelectedCourse().getAssignmentAddPanel();
             
             // set the other clickers to false
-            cookieBtn.setVisible(false);
+            gradeStudentBtn.setVisible(false);
             addStudentBtn.setVisible(false);
-
+            classStatsLabel.setVisible(false);  
+            removeStudentBtn.setVisible(false);
         });
 
-        addStudentBtn.addActionListener(_ -> {
+        removeStudentBtn.addActionListener(e -> {
+            Course insideCourse = controller.getSelectedCourse();
+            StudentList studentList = insideCourse.getStudents();
+
+            if (studentList.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "There are no students to remove.");
+                return;
+            }
+
+            JPanel removePanel = new JPanel(new GridLayout(0, 1));
+            ArrayList<JCheckBox> checkboxes = new ArrayList<>();
+            ArrayList<Student> studentRefs = new ArrayList<>();
+
+            for (Student student : studentList) {
+                JCheckBox box = new JCheckBox(student.getFullName() + " (" + student.getUsername() + ")");
+                checkboxes.add(box);
+                studentRefs.add(student);
+                removePanel.add(box);
+            }
+
+            int result = JOptionPane.showConfirmDialog(this, removePanel, "Remove Students", JOptionPane.OK_CANCEL_OPTION);
+            if (result == JOptionPane.OK_OPTION) {
+                for (int i = 0; i < checkboxes.size(); i++) {
+                    if (checkboxes.get(i).isSelected()) {
+                        course.removeStudent(studentRefs.get(i));
+                    }
+                }
+                infoArea.setText(getClasslistInfo()); // refresh the classlist display
+            }
+        });
+
+        
+        addStudentBtn.addActionListener(e -> {
             controller.getSelectedCourse().addAllStudentsFromPool();
             infoArea.setText(getClasslistInfo()); // refresh after adding
         });
         
-        sideAddAssignmentBtn.addActionListener(_ -> {
+        sideAddAssignmentBtn.addActionListener(e -> {
             Course selectedCourse = controller.getSelectedCourse();
             JPanel assignmentPanel = selectedCourse.getAssignmentAddPanel();
             int result = JOptionPane.showConfirmDialog(this, assignmentPanel, selectedCourse.getCourseCode(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
@@ -216,11 +326,8 @@ public class CourseDashboard extends JPanel {
                 updateAssignmentDisplay();
             }
         });
-
-
-        // cookie btn is the addstudnent one, i just gotta change the labels, 
        
-        cookieBtn.addActionListener(_ -> {
+        gradeStudentBtn.addActionListener(e -> {
             Course cur = controller.getSelectedCourse();
             StudentList studentList = cur.getStudents();
 
@@ -240,7 +347,7 @@ public class CourseDashboard extends JPanel {
 
             // === ASSIGNMENT DROPDOWN (will be dynamically updated) ===
             JComboBox<String> assignmentDropdown = new JComboBox<>();
-            categoryDropdown.addActionListener(_ -> {
+            categoryDropdown.addActionListener(e2 -> {
                 assignmentDropdown.removeAllItems();
                 String selectedCategory = (String) categoryDropdown.getSelectedItem();
                 for (Assignment a : course.getCategories().get(selectedCategory).getAssignments()) {
@@ -281,7 +388,15 @@ public class CourseDashboard extends JPanel {
 
                     if (originalAssignment != null && selectedStudent != null) {
                         selectedStudent.getGradebookForCourse(course).addAssignment(new Assignment(originalAssignment), grade);
-                        JOptionPane.showMessageDialog(this, "Grade assigned successfully!");
+                     // Immediately refresh the display and stats
+                        infoArea.setText(getGradesInfo());
+
+                        Course selectedCourse = controller.getSelectedCourse();
+                        StudentList classlist = selectedCourse.getStudents();
+                        double avg = classlist.getClassAverage(selectedCourse);
+                        double median = classlist.getClassMedian(selectedCourse);
+
+                        classStatsLabel.setText(String.format("Class Average: %.2f%%   Median: %.2f%%", avg, median));
                     } else {
                         JOptionPane.showMessageDialog(this, "Invalid selection.");
                     }
@@ -325,7 +440,32 @@ public class CourseDashboard extends JPanel {
 
         return sb.toString();
     }
+    
+    private void updateSortedClasslist(int sortOption) {
+        Course course = controller.getSelectedCourse();
+        StudentList students = new StudentList(course.getStudents()); 
 
+        switch (sortOption) {
+            case 0: students.sortByFirstName(); break;
+            case 1: students.sortByLastName(); break;
+            case 2: students.sortByUsername(); break;
+            case 3:
+            	students.sortByAssignmentGrade(controller.getSelectedCourse().getName());
+            	break;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Classlist for ").append(course.getName()).append(":\n\n");
+
+        for (Student student : students) {
+            sb.append(student.getFirstName()).append(" ").append(student.getLastName())
+              .append(" - ").append(student.getEmail()).append("\n");
+        }
+
+        infoArea.setText(sb.toString());
+    }
+
+    
     private String getGradesInfo() {
         Course course = controller.getSelectedCourse();
         StudentList classlist = course.getStudents();
@@ -347,9 +487,9 @@ public class CourseDashboard extends JPanel {
 
             for (Assignment a : gb.getAssignments()) {
                 sb.append("  ").append(a.getTitle())
-                  .append(" - ").append(a.getPointsEarned())
+                  .append(" - ").append(a.getPointsEarned ())
                   .append("/").append(a.getMaxPoints()).append("\n");
-                totalEarned += a.getPointsEarned();
+                totalEarned += a.getPointsEarned ();
                 totalPossible += a.getMaxPoints();
             }
 
@@ -361,4 +501,24 @@ public class CourseDashboard extends JPanel {
 
         return sb.toString();
     }
+    
+    private void updateSortedClasslist(int sortOption, String assignmentName) {
+        Course course = controller.getSelectedCourse();
+        StudentList students = new StudentList(course.getStudents()); // copy
+
+        if (sortOption == 3) {
+            students.sortByAssignmentGrade(assignmentName);
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Classlist for ").append(course.getName()).append(" (Sorted by grades on \"").append(assignmentName).append("\"):\n\n");
+
+        for (Student student : students) {
+            sb.append(student.getFirstName()).append(" ").append(student.getLastName())
+              .append(" - ").append(student.getEmail()).append("\n");
+        }
+
+        infoArea.setText(sb.toString());
+    }
+
 }
