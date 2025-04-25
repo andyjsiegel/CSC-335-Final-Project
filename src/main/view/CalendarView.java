@@ -10,7 +10,6 @@ import main.model.User;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -87,7 +86,7 @@ public class CalendarView extends JFrame {
                 if (!displayedCourses.contains(course.getCourseCode())) {
                     JButton classLabel = new JButton(course.getName());
                     classLabel.setText("<html><center>"+course.getName()+"<br>("+course.getCourseCode()+")</center></html>");
-                    classLabel.addActionListener(e -> {
+                    classLabel.addActionListener(_ -> {
                     	 JOptionPane.showMessageDialog(null, course.getCourseView(isInstructor), course.getCourseCode(), JOptionPane.PLAIN_MESSAGE);
                     });
                     

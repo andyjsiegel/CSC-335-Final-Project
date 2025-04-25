@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.Arrays;
 
 import javax.swing.*;
 import java.awt.*;
@@ -192,7 +190,7 @@ public class Course {
         });
 
         JButton addButton = new JButton("Add");
-        addButton.addActionListener(e -> {
+        addButton.addActionListener(_ -> {
             String title = titleField.getText();
             String description = descriptionField.getText();
             String category = categoryField.getSelectedItem().toString();
@@ -349,7 +347,7 @@ public class Course {
             assignmentsListPanel.setVisible(false);
 
             // Toggle visibility on button click
-            toggleButton.addActionListener(e -> {
+            toggleButton.addActionListener(_ -> {
                 assignmentsListPanel.setVisible(toggleButton.isSelected());
                 // Revalidate and repaint to update UI
                 assignmentsPanel.revalidate();

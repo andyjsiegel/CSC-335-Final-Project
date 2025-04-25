@@ -171,7 +171,7 @@ public class CourseDashboard extends JPanel {
         // === BUTTON LOGIC === (it will be placeholder for adding students and assignemnts, just testing
         // how it would look like)
 
-        viewGradesBtn.addActionListener(e -> {
+        viewGradesBtn.addActionListener(_ -> {
             infoArea.setText(getGradesInfo());
             sideAddAssignmentBtn.setVisible(false);
             cookieBtn.setVisible(true);
@@ -179,7 +179,7 @@ public class CourseDashboard extends JPanel {
 
         });
 
-        addClasslistBtn.addActionListener(e -> {
+        addClasslistBtn.addActionListener(_ -> {
             infoArea.setText(getClasslistInfo());
             sideAddAssignmentBtn.setVisible(false);
             cookieBtn.setVisible(false);
@@ -187,7 +187,7 @@ public class CourseDashboard extends JPanel {
 
         });
 
-        addAssignmentBtn.addActionListener(e -> {
+        addAssignmentBtn.addActionListener(_ -> {
             Course selectedCourse = controller.getSelectedCourse();
 
             // STEP 1: Show existing assignments in infoArea
@@ -203,12 +203,12 @@ public class CourseDashboard extends JPanel {
 
         });
 
-        addStudentBtn.addActionListener(e -> {
+        addStudentBtn.addActionListener(_ -> {
             controller.getSelectedCourse().addAllStudentsFromPool();
             infoArea.setText(getClasslistInfo()); // refresh after adding
         });
         
-        sideAddAssignmentBtn.addActionListener(e -> {
+        sideAddAssignmentBtn.addActionListener(_ -> {
             Course selectedCourse = controller.getSelectedCourse();
             JPanel assignmentPanel = selectedCourse.getAssignmentAddPanel();
             int result = JOptionPane.showConfirmDialog(this, assignmentPanel, selectedCourse.getCourseCode(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
@@ -220,7 +220,7 @@ public class CourseDashboard extends JPanel {
 
         // cookie btn is the addstudnent one, i just gotta change the labels, 
        
-        cookieBtn.addActionListener(e -> {
+        cookieBtn.addActionListener(_ -> {
             Course cur = controller.getSelectedCourse();
             StudentList studentList = cur.getStudents();
 
@@ -240,7 +240,7 @@ public class CourseDashboard extends JPanel {
 
             // === ASSIGNMENT DROPDOWN (will be dynamically updated) ===
             JComboBox<String> assignmentDropdown = new JComboBox<>();
-            categoryDropdown.addActionListener(e2 -> {
+            categoryDropdown.addActionListener(_ -> {
                 assignmentDropdown.removeAllItems();
                 String selectedCategory = (String) categoryDropdown.getSelectedItem();
                 for (Assignment a : course.getCategories().get(selectedCategory).getAssignments()) {

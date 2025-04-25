@@ -3,16 +3,13 @@ package main.view;
 import javax.swing.*;
 
 import main.controller.UserViewController;
-import main.model.Days;
 import main.model.User;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.List;
 
 public class AddClassPanel extends JPanel {
 
-    private User user;
     private UserViewController controller;
 
     private JTextField classNameField;
@@ -22,7 +19,6 @@ public class AddClassPanel extends JPanel {
     private JButton submitButton;
 
     public AddClassPanel(User user, UserViewController controller) {
-        this.user = user;
         this.controller = controller; // Use the one passed in
 
 
@@ -61,7 +57,7 @@ public class AddClassPanel extends JPanel {
 
         // Submit Button
         submitButton = new JButton("Submit");
-        submitButton.addActionListener(e -> handleSubmit());
+        submitButton.addActionListener(_ -> handleSubmit());
         formPanel.add(submitButton);
 
         add(formPanel, BorderLayout.NORTH);

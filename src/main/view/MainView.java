@@ -35,7 +35,7 @@ public class MainView extends JFrame {
 
         // Create "Logout" menu item
         JMenuItem logoutItem = new JMenuItem("Logout");
-        logoutItem.addActionListener(e -> {
+        logoutItem.addActionListener(_ -> {
             dispose(); // Close the current window
             new LoginScreen(); // Open the login screen
         });
@@ -55,16 +55,16 @@ public class MainView extends JFrame {
         bottomPanel.setLayout(new GridLayout(1, 4));
 
         JButton addClassButton = new JButton("Add Class");
-        addClassButton.addActionListener(e -> showAddClassPanel());
+        addClassButton.addActionListener(_ -> showAddClassPanel());
 
         JButton addAssignmentButton = new JButton("List View Classes");
-        addAssignmentButton.addActionListener(e -> showListViewClassesPanel());
+        addAssignmentButton.addActionListener(_ -> showListViewClassesPanel());
 
         JButton viewCalendarButton = new JButton("View Calendar");
-        viewCalendarButton.addActionListener(e -> showCalendarPanel());
+        viewCalendarButton.addActionListener(_ -> showCalendarPanel());
 
         //JButton testing = new JButton("testing");
-        //testing.addActionListener(e -> showTestingPanel());
+        //testing.addActionListener(_ -> showTestingPanel());
         
         if(controller.getUser() instanceof Instructor) bottomPanel.add(addClassButton);
         bottomPanel.add(addAssignmentButton);
@@ -93,7 +93,7 @@ public class MainView extends JFrame {
     public void showCourseDashboard(Course course) {
         mainPanel.removeAll();
         controller.setSelectedCourse(course);
-        CourseDashboard dashboard = new CourseDashboard(e -> returnToMainPanel(), controller);
+        CourseDashboard dashboard = new CourseDashboard(_ -> returnToMainPanel(), controller);
         mainPanel.add(dashboard, BorderLayout.CENTER);
         mainPanel.revalidate();
         mainPanel.repaint();

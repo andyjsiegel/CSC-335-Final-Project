@@ -11,8 +11,7 @@ public class StudentGradebook {
 	 */
 	
 	private double points;
-	private int assignmentCount;
-	private double classAverage;
+	private double calculatedGrade;
 	private double median;
 	private String courseTitle;
 	private ArrayList<Assignment> courseAssignments;
@@ -28,42 +27,40 @@ public class StudentGradebook {
 		assignment.setPointsEarned(grade);
 		this.courseAssignments.add(assignment);
 		this.points += grade;
-		this.assignmentCount++;
 	}
 	
-	public void calculateAverage() {
-		int totalPoints = 0;
+	public double calculateAverage() {
+		int maxPoints = 0;
 		
 		for (Assignment assignment : courseAssignments) {
-			totalPoints += assignment.getMaxPoints();
+			maxPoints += assignment.getMaxPoints();
 		}
 		
-		classAverage = (totalPoints / points) * 100;
+		calculatedGrade = (points / maxPoints) * 100;
+		return calculatedGrade;
 	}
 	
 	
-	// this should probably just calculate it automatically, and should just call it, we have the data either way so 
-	public void setFinalGrade() {
+	public FinalGrades getFinalGrade() {
 		
 		calculateAverage();
-		double finalGrade = classAverage;
 		
-	    if (finalGrade >= 90) {
+	    if (calculatedGrade >= 90) {
 	        this.finalGrade = FinalGrades.A;
-	    } else if (finalGrade >= 80) {
+	    } else if (calculatedGrade >= 80) {
 	    	this.finalGrade = FinalGrades.B;
-	    } else if (finalGrade >= 70) {
+	    } else if (calculatedGrade >= 70) {
 	    	this.finalGrade =  FinalGrades.C;
-	    } else if (finalGrade >= 60) {
+	    } else if (calculatedGrade >= 60) {
 	    	this.finalGrade = FinalGrades.D;
 	    } else {
 			this.finalGrade = FinalGrades.E;
 		}
-	    
+	    return this.finalGrade;
 	}
 
 	// this is for the entire course of students, not just one stupid ahh ahh instructions ahhhhh
-	public void calculateMedian() {
+	public double calculateMedian() {
 
 	    ArrayList<Double> grades = new ArrayList<>();
 	    
@@ -84,10 +81,23 @@ public class StudentGradebook {
 	    }
 
 	    this.median = median;
+		return this.median;
 	}
 
 	public ArrayList<Assignment> getAssignments() {
 		return new ArrayList<>(courseAssignments);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+		StudentGradebook other = (StudentGradebook) obj;
+		return courseTitle.equals(other.courseTitle) && points == other.points;
 	}
 
 }

@@ -9,10 +9,8 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class ListViewClassesPanel extends JPanel {
-    private UserViewController controller;
 
     public ListViewClassesPanel(UserViewController controller) {
-        this.controller = controller;
         setLayout(new BorderLayout());
 
         JPanel courseListPanel = new JPanel();

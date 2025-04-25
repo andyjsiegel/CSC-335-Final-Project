@@ -3,7 +3,6 @@ package main.tests;
 import org.junit.jupiter.api.*;
 
 import main.model.*;
-import java.util.*;
 
 import java.lang.reflect.Field;
 
@@ -28,7 +27,7 @@ class StudentGradebookTest {
     void testCalculateAverageAndFinal() {
         gb.calculateAverage();
         // just ensure no exception
-        gb.setFinalGrade();
+        gb.getFinalGrade();
     }
 
     @Test
@@ -56,7 +55,7 @@ class StudentGradebookTest {
             "Expected classAverage = (30 / 24) * 100 ≈ 125.0");
 
         // Now set and verify the finalGrade
-        sg.setFinalGrade();
+        sg.getFinalGrade();
         Field fgField = StudentGradebook.class.getDeclaredField("finalGrade");
         fgField.setAccessible(true);
         FinalGrades fg = (FinalGrades) fgField.get(sg);
@@ -140,8 +139,9 @@ class StudentGradebookTest {
     void testSetFinalGrade() throws Exception {
         StudentGradebook sg = new StudentGradebook("DummyCourse") {
             @Override
-            public void calculateAverage() {
-                // do nothing
+            public double calculateAverage() {
+                // do nothing,
+                return 0.0; 
             }
         };
 
@@ -173,17 +173,12 @@ class StudentGradebookTest {
             final FinalGrades expectedGrade = expects[i];
 
             avgField.setDouble(sg, injectedAverage);
-            sg.setFinalGrade();
+            sg.getFinalGrade();
 
             FinalGrades actual = (FinalGrades) fgField.get(sg);
             assertEquals(expectedGrade, actual,
                 () -> String.format("With classAverage=%.1f expected %s but got %s",
                                     injectedAverage, expectedGrade, actual));
         }
-    }
-
-    // helper to avoid magic literal
-    private static double fiftyfive() {
-        return 55.0;
     }
 }
