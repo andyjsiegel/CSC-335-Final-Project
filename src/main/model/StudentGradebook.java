@@ -56,11 +56,9 @@ public class StudentGradebook {
 	    	this.finalGrade =  FinalGrades.C;
 	    } else if (finalGrade >= 60) {
 	    	this.finalGrade = FinalGrades.D;
-	    } else if (finalGrade >= 50) {
-	    	this.finalGrade = FinalGrades.E;
 	    } else {
-	    	this.finalGrade = FinalGrades.F;
-	    }
+			this.finalGrade = FinalGrades.E;
+		}
 	    
 	}
 

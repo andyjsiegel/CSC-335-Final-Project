@@ -164,7 +164,7 @@ class StudentGradebookTest {
         	    //  59.9, 55.0, 50.0   <-- three E’s here
         	    FinalGrades.E, FinalGrades.E, FinalGrades.E,
         	    //  49.9, 30.0
-        	    FinalGrades.F, FinalGrades.F
+        	    FinalGrades.E, FinalGrades.E
         	};
 
 
