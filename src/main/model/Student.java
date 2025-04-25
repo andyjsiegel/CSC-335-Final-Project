@@ -66,15 +66,20 @@ public class Student extends User {
 	}
 
 	public static Comparator<Student> sortByGradeOnAssignment(String assignmentName) {
-		return new Comparator<Student>() {
-			@Override
-			public int compare(Student s1, Student s2) {
-				double grade1 = s1.getAssignmentByName(assignmentName).getGrade();
-				double grade2 = s2.getAssignmentByName(assignmentName).getGrade();
-				return Double.compare(grade1, grade2); 
-			}
-		};
+	    return new Comparator<Student>() {
+	        @Override
+	        public int compare(Student s1, Student s2) {
+	            Assignment a1 = s1.getAssignmentByName(assignmentName);
+	            Assignment a2 = s2.getAssignmentByName(assignmentName);
+	            // -1 is students withotu grades 
+	            double grade1 = (a1 != null) ? a1.getGrade() : -1.0; 
+	            double grade2 = (a2 != null) ? a2.getGrade() : -1.0;
+
+	            return Double.compare(grade1, grade2);
+	        }
+	    };
 	}
+
 	
 
 	public Assignment getAssignmentByName(String assignmentName) {
