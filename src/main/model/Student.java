@@ -19,6 +19,14 @@ public class Student extends User {
         super(other.username, other.password, other.firstName, other.lastName, other.email,true);
     }
 
+	public ArrayList<Assignment> getAllAssignments() {
+		ArrayList<Assignment> studentAssignments = new ArrayList<Assignment>();
+		for (StudentGradebook gradebook : gradebooks) {
+			studentAssignments.addAll(gradebook.getAssignments());
+		}
+		return studentAssignments;
+	}
+
 	public StudentGradebook getGradebookForCourse(Course course) {
 		return gradebooks.get(coursesTaken.indexOf(course));
 	}
@@ -55,6 +63,27 @@ public class Student extends User {
 				return nameCompare;
 				}
 		};
+	}
+
+	public static Comparator<Student> sortByGradeOnAssignment(String assignmentName) {
+		return new Comparator<Student>() {
+			@Override
+			public int compare(Student s1, Student s2) {
+				double grade1 = s1.getAssignmentByName(assignmentName).getGrade();
+				double grade2 = s2.getAssignmentByName(assignmentName).getGrade();
+				return Double.compare(grade1, grade2); 
+			}
+		};
+	}
+	
+
+	public Assignment getAssignmentByName(String assignmentName) {
+		for (Assignment assignment : getAllAssignments()) {
+			if (assignment.getTitle().equals(assignmentName)) {
+				return assignment;
+			}
+		}
+		return null;
 	}
 
 	public String getFullName() {
