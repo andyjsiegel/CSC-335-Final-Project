@@ -15,7 +15,6 @@ import main.view.NumberField;
 public class Course {
     private String code;
     private String name;
-    private String credits;
     private String description;
     private Instructor instructor;
     private ArrayList<Days> daysOfWeek;
@@ -26,12 +25,11 @@ public class Course {
     private HashMap<String, JLabel> assignmentLabels = new HashMap<String, JLabel>();
 
     
-    public Course(String name, String code, String credits, String description,
+    public Course(String name, String code, String description,
                   Instructor instructor, ArrayList<Days> daysOfWeek) {
         
         this.name = name;
         this.code = code;
-        this.credits = credits;
         
     	this.description = description;
         this.instructor = instructor;

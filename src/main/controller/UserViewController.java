@@ -21,7 +21,7 @@ public class UserViewController {
     }
 
     
-    public void addCourse(String className, String classCode, String credits, String classDescription, List<String> selectedDays) {
+    public void addCourse(String className, String classCode, String classDescription, List<String> selectedDays) {
         if (!(user instanceof Instructor)) {
             throw new IllegalArgumentException("User is not an instructor and thus cannot create a course.");
         }
@@ -40,7 +40,7 @@ public class UserViewController {
             }
         }
 
-        Course course = new Course(className, classCode, credits, classDescription, (Instructor) this.user, dayList);
+        Course course = new Course(className, classCode, classDescription, (Instructor) this.user, dayList);
         course.setDefaultCategories();
         course.addAllStudentsFromPool();
         gradebook.addCourse(course);

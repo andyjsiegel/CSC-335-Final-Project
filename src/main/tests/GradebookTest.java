@@ -22,7 +22,7 @@ class GradebookTest {
         Gradebook gb = new Gradebook();
         gb.addInstructor(new Instructor("u","p","I","N","e",true));
         gb.addStudent(new Student("u","p","F","L","e",true));
-        gb.addCourse(new Course("N","C","3","D",
+        gb.addCourse(new Course("N","C","D",
             new Instructor("u","p","I","N","e",true),
             new ArrayList<>()));
     }

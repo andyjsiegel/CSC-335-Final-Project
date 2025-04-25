@@ -16,7 +16,7 @@ class StudentTest {
     @BeforeEach
     void setup() {
         s = new Student("user","pass","First","Last","e@mail", false);
-        c1 = new Course("Course1","CS101","3","Desc",
+        c1 = new Course("Course1","CS101","Desc",
             new Instructor("i","p","I","N","e",false),
             new ArrayList<>(List.of(Days.MONDAY, Days.WEDNESDAY)));
     }

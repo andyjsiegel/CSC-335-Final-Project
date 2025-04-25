@@ -25,7 +25,6 @@ class CourseTest {
         course = new Course(
             "Intro to Testing",
             "TEST101",
-            "3",
             "A course on how to test Java code",
             instructor,
             new ArrayList<>(days)
@@ -36,7 +35,6 @@ class CourseTest {
     void testConstructorAndGetters() {
         assertEquals("Intro to Testing", course.getName());
         assertEquals("TEST101",         course.getCourseCode());
-        assertEquals("3",               course.getCredits());
         assertEquals("A course on how to test Java code", course.getDescription());
         assertSame(instructor,          course.getInstructor());
         assertEquals(days,              course.getDays());
