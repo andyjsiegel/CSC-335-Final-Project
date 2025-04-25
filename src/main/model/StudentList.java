@@ -35,11 +35,21 @@ public class StudentList implements Iterable<Student> {
 		return internalStudentList.get(index);
 	}
 	
-	
     public void sortByFirstName() {
         Collections.sort(internalStudentList, Student.sortByFirstName());
     }
+    
+    public void sortByLastName() {
+        Collections.sort(internalStudentList, Student.sortByLastName());
+    }
 
+    public void sortByUsername() {
+        Collections.sort(internalStudentList, Student.sortByUsername());
+    }
+
+    public void sortByAssignmentGrade(String assignmentName) {
+    	Collections.sort(internalStudentList, Student.sortByGradeOnAssignment(assignmentName));
+    }
     
 	@Override
 	public Iterator<Student> iterator() {
@@ -62,5 +72,52 @@ public class StudentList implements Iterable<Student> {
 		this.internalStudentList.addAll(uniqueStudents);
 	}
 	
-	
+	public double getClassMedian(Course course) {
+        ArrayList<Double> percentages = new ArrayList<>();
+
+        for (Student student : this) {
+            StudentGradebook gb = student.getGradebookForCourse(course);
+            if (gb == null || gb.getAssignments().isEmpty()) continue;
+
+            double earned = 0;
+            double possible = 0;
+
+            for (Assignment a : gb.getAssignments()) {
+                earned += a.getPointsEarned();
+                possible += a.getMaxPoints();
+            }
+
+            if (possible > 0) {
+                percentages.add((earned / possible) * 100);
+            }
+        }
+
+        if (percentages.isEmpty()) return 0.0;
+
+        Collections.sort(percentages);
+        int n = percentages.size();
+        if (n % 2 == 1) {
+            return percentages.get(n / 2);
+        } else {
+            return (percentages.get(n / 2 - 1) + percentages.get(n / 2)) / 2.0;
+        }
+    }
+
+    
+    public double getClassAverage(Course course) {
+        double totalEarned = 0;
+        double totalPossible = 0;
+
+        for (Student student : this) {
+            StudentGradebook gb = student.getGradebookForCourse(course);
+            if (gb == null) continue;
+
+            for (Assignment a : gb.getAssignments()) {
+                totalEarned += a.getPointsEarned();
+                totalPossible += a.getMaxPoints();
+            }
+        }
+
+        return totalPossible > 0 ? (totalEarned / totalPossible) * 100 : 0.0;
+    }
 }
