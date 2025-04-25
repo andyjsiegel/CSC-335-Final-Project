@@ -318,10 +318,10 @@ public class Course {
             for (Assignment assignment : assignments) {
                 // assignment.setGradeTo100();
                 if(assignment.isGraded()) {
-                    pointsEarned += assignment.getGrade();
+                    pointsEarned += assignment.getPointsEarned();
                     numGraded++;
                 }
-                JLabel assignmentLabel = new JLabel(assignment.getTitle() + " : " + (assignment.isGraded() ? assignment.getGrade() + "/" + assignment.getMaxPoints() : "--/" + assignment.getMaxPoints()));
+                JLabel assignmentLabel = new JLabel(assignment.getTitle() + " : " + (assignment.isGraded() ? assignment.getPointsEarned() + "/" + assignment.getMaxPoints() : "--/" + assignment.getMaxPoints()));
                 assignmentLabels.put(assignment.getTitle(), assignmentLabel);
                 assignmentLabel.setBorder(BorderFactory.createEmptyBorder(2, 20, 2, 2));
                 assignmentsListPanel.add(assignmentLabel);
@@ -402,10 +402,10 @@ public class Course {
         ArrayList<Assignment> assignments = getAssignmentsByName(assignmentName);
         List<Assignment> gradedAssignments = assignments.stream().filter(assignment -> assignment.isGraded()).collect(Collectors.toList());
         System.out.println(gradedAssignments.size());
-        double mean = gradedAssignments.stream().mapToDouble(Assignment::getGrade)
+        double mean = gradedAssignments.stream().mapToDouble(Assignment::getPointsEarned)
             .average()
             .orElse(0.0); 
-        double median = gradedAssignments.stream().mapToDouble(Assignment::getGrade)
+        double median = gradedAssignments.stream().mapToDouble(Assignment::getPointsEarned)
             .sorted()
             .boxed()
             .collect(Collectors.toList())

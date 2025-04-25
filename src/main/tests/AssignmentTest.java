@@ -27,9 +27,9 @@ class AssignmentTest {
     @Test
     void testGradeMethods() {
         a.setGradeTo100();
-        assertEquals(50, a.getGrade());
-        a.setGrade(25.0);
-        assertEquals(25.0, a.getGrade());
+        assertEquals(50, a.getPointsEarned());
+        a.setPointsEarned(25.0);
+        assertEquals(25.0, a.getPointsEarned());
         assertEquals(50, a.getMaxPoints());
     }
 
@@ -43,7 +43,7 @@ class AssignmentTest {
     @Test
     void testInitialGradeAndMaxPoints() {
         // new assignments start ungraded at -1.0
-        assertEquals(-1.0, a.getGrade());
+        assertEquals(-1.0, a.getPointsEarned());
         // maxPoints getter
         assertEquals(50.0, a.getMaxPoints());
     }
@@ -59,7 +59,7 @@ class AssignmentTest {
     void testEqualsDifferentGradeThrowsNPE() {
         Assignment b = new Assignment("T","D",50);
         // change grade so points ≠; title matches but dueDate is still null
-        b.setGrade(0.0);
+        b.setPointsEarned(0.0);
         // title== true, so it falls through to dueDate.equals → NPE
         assertThrows(NullPointerException.class, () -> a.equals(b));
     }
@@ -77,7 +77,7 @@ class AssignmentTest {
         assertTrue(a.equals(b));
 
         // change b’s grade → should now be unequal
-        b.setGrade(10.0);
+        b.setPointsEarned(10.0);
         assertFalse(a.equals(b));
     }
 
@@ -93,7 +93,7 @@ class AssignmentTest {
         // new assignments start ungraded (points = -1)
         assertFalse(a.isGraded(), "fresh assignment should not be graded");
         // once you give it any non-negative score, isGraded flips to true
-        a.setGrade(0.0);
+        a.setPointsEarned(0.0);
         assertTrue(a.isGraded(), "zero is still considered graded");
         a.setGradeTo100();
         assertTrue(a.isGraded(), "full points is also graded");
@@ -102,7 +102,7 @@ class AssignmentTest {
     @Test
     void testCopyConstructorCreatesIndependentCopy() {
         // give the original a score
-        a.setGrade(30.0);
+        a.setPointsEarned(30.0);
         // build a copy
         Assignment copy = new Assignment(a);
         // they are distinct objects
@@ -110,14 +110,14 @@ class AssignmentTest {
         // but share the same data at time of copy
         assertEquals(a.getTitle(),     copy.getTitle());
         assertEquals(a.getMaxPoints(), copy.getMaxPoints());
-        assertEquals(a.getGrade(),     copy.getGrade());
+        assertEquals(a.getPointsEarned(),     copy.getPointsEarned());
         // and copy’s isGraded matches original’s
         assertTrue(copy.isGraded());
 
         // now mutate the original again
-        a.setGrade(40.0);
+        a.setPointsEarned(40.0);
         // but copy remains unchanged
-        assertEquals(30.0, copy.getGrade(),
+        assertEquals(30.0, copy.getPointsEarned(),
             "copy should retain the old grade even if original changes");
     }
 

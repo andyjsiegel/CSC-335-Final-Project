@@ -25,7 +25,7 @@ public class StudentGradebook {
 	
 	// must pass a copy of Assignments to this first btw 
 	public void addAssignment(Assignment assignment, double grade) {
-		assignment.setGrade(grade);
+		assignment.setPointsEarned(grade);
 		this.courseAssignments.add(assignment);
 		this.points += grade;
 		this.assignmentCount++;
@@ -70,7 +70,7 @@ public class StudentGradebook {
 	    ArrayList<Double> grades = new ArrayList<>();
 	    
 	    for (Assignment assignment : courseAssignments) {
-	        grades.add(assignment.getGrade()); 
+	        grades.add(assignment.getPointsEarned()); 
 	    }
 
 	    Collections.sort(grades);

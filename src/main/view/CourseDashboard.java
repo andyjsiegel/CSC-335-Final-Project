@@ -347,9 +347,9 @@ public class CourseDashboard extends JPanel {
 
             for (Assignment a : gb.getAssignments()) {
                 sb.append("  ").append(a.getTitle())
-                  .append(" - ").append(a.getGrade())
+                  .append(" - ").append(a.getPointsEarned())
                   .append("/").append(a.getMaxPoints()).append("\n");
-                totalEarned += a.getGrade();
+                totalEarned += a.getPointsEarned();
                 totalPossible += a.getMaxPoints();
             }
 
