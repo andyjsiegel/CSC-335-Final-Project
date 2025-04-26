@@ -3,6 +3,7 @@ package main.model;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Collections;
 
 
@@ -120,4 +121,21 @@ public class StudentList implements Iterable<Student> {
 
         return totalPossible > 0 ? (totalEarned / totalPossible) * 100 : 0.0;
     }
+    
+ // in StudentList.java
+    public List<StudentList> partition(int maxPerGroup) {
+        if (maxPerGroup <= 0) throw new IllegalArgumentException("group size must be positive");
+        List<StudentList> groups = new ArrayList<>();
+        for (int i = 0; i < internalStudentList.size(); i += maxPerGroup) {
+            StudentList chunk = new StudentList();
+            int end = Math.min(i + maxPerGroup, internalStudentList.size());
+            for (int j = i; j < end; j++) {
+                chunk.add(internalStudentList.get(j));
+            }
+            groups.add(chunk);
+        }
+        return groups;
+    }
+
+
 }

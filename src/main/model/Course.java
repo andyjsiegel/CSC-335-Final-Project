@@ -2,6 +2,7 @@ package main.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
@@ -16,7 +17,10 @@ public class Course {
     private Instructor instructor;
     private ArrayList<Days> daysOfWeek;
     private StudentList studentList;
-
+    
+    private double weight;           // percentage of final grade
+    private int dropLowest;          // how many to drop
+    
     private CourseAssignments assignments;
     private HashMap<String, Category> categories;
     private HashMap<String, JLabel> assignmentLabels = new HashMap<String, JLabel>();
@@ -134,8 +138,11 @@ public class Course {
             }
     
             Assignment assignment = new Assignment(title, description, maxPoints);
+            assignment.setCategory(category);
             categories.get(category).addAssignment(assignment);
             this.addAssignment(assignment);
+            
+            
     
             // Add the assignment to all students
             for (Student student : studentList) {
@@ -195,6 +202,29 @@ public class Course {
     public ArrayList<Days> getDays() {
         return daysOfWeek;
     }
+    
+    /** Add a brand-new category with its weight and how many to drop. */
+    public void addCategory(String name, int weightPts, int dropLowest) {
+      Category c = new Category(name, weightPts, dropLowest);
+      categories.put(name, c);
+    }
+    /** Remove one of the existing categories. */
+    public void removeCategory(String name) {
+      categories.remove(name);
+    }
+    
+    /** called by the Manage Categories dialog */
+    public void setCategoryWeight(String categoryName, int weight) {
+      Category cat = categories.get(categoryName);
+      if (cat != null) cat.setPoints(weight);
+    }
+
+    /** called by the Manage Categories dialog */
+    public void setCategoryDropLowest(String categoryName, int dropLowest) {
+      Category cat = categories.get(categoryName);
+      if (cat != null) cat.setDropLowest(dropLowest);
+    }
+    
 
     public JPanel getAssignmentAddPanel() {
         JPanel panel = new JPanel();
@@ -242,6 +272,7 @@ public class Course {
             String category = categoryField.getSelectedItem().toString();
             int maxPoints = Integer.parseInt(maxPointsField.getText());
             Assignment assignment = new Assignment(title, description, maxPoints);
+            assignment.setCategory(category);
             categories.get(category).addAssignment(assignment);
             this.addAssignment(assignment);
             titleField.setText("");
@@ -366,5 +397,32 @@ public class Course {
             .get(gradedAssignments.size() / 2);
         assignmentLabels.get(assignmentName).setText("Mean: " + String.format("%.2f", mean) + " Median: " + median);
     }
+    
+    
+    
+    public enum CalculationMode { POINTS_SUM, WEIGHTED }
 
+	// add to Course fields:
+	private CalculationMode calculationMode = CalculationMode.WEIGHTED;
+	
+	// getters / setters:
+	public CalculationMode getCalculationMode() { return calculationMode; }
+	public void setCalculationMode(CalculationMode m) { this.calculationMode = m; }
+	
+	
+	public GradingScheme getGradingScheme() {
+	    // 1) total up all category‐points
+	    double totalPoints = categories.values().stream()
+	                                   .mapToDouble(Category::getPoints)
+	                                   .sum();
+	    // 2) build the two maps
+	    Map<String,Double> weightMap = new HashMap<>();
+	    Map<String,Integer> dropMap   = new HashMap<>();
+	    for (Category cat : categories.values()) {
+	        weightMap.put(cat.getName(), cat.getPoints() / totalPoints);
+	        dropMap  .put(cat.getName(), cat.getDropLowest());
+	    }
+	    return new GradingScheme(weightMap, dropMap);
+	}
+    
 }

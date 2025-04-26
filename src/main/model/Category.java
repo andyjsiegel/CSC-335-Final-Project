@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public class Category {
     private int points;
     private String name;
+    private int dropLowest;
     private ArrayList<Assignment> assignments;
     
     // the expPointsPer represents the expected points for an assignment in the category, like a default. 
@@ -62,6 +63,17 @@ public class Category {
     }
 
     public void addAssignment(Assignment assignment) {
+        // tag the assignment with its category name
+        assignment.setCategory(this.name);
         this.assignments.add(assignment);
     }
+
+    public int getDropLowest() { 
+    	return dropLowest; 
+   	}
+    
+    public void setDropLowest(int d) { 
+    	this.dropLowest = d; 
+    }
+    
 }

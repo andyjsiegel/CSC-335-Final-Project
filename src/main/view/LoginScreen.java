@@ -28,7 +28,7 @@ public class LoginScreen extends JFrame {
         Font font = new Font("Tahoma", Font.PLAIN, 14);
 
         // Title label
-        JLabel titleLabel = new JLabel("CSC 335 Gradebook Login");
+        JLabel titleLabel = new JLabel("UArizona D2L Login");
         titleLabel.setFont(new Font("Tahoma", Font.BOLD, 20));
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         gbc.gridx = 0;

@@ -10,6 +10,8 @@ public class Assignment {
     private double points;
     private double maxPoints;
     
+    private String category;   // the Category name this assignment belongs to
+    
     // An assignment would look something like this:
     // Final Project (name) due on April 29 (due date) 
     // Final class project incorporating everything learned (Description)
@@ -28,6 +30,7 @@ public class Assignment {
         this.description = other.description;
         this.maxPoints = other.maxPoints;
         this.points = other.points;
+        this.category    = other.category;
     }
     
     public String getTitle() {
@@ -63,6 +66,14 @@ public class Assignment {
             return -1;
         }
         return this.points/this.maxPoints;
+    }
+    
+    /** Category name getter/setter */
+    public String getCategory() {
+        return category;
+    }
+    public void setCategory(String category) {
+        this.category = category;
     }
     
     @Override
