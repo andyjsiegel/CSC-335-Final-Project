@@ -2,6 +2,7 @@ package main.view;
 
 import javax.swing.*;
 import main.model.Assignment;
+import main.model.Category;
 
 import java.awt.*;
 import java.awt.event.ActionListener;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import main.controller.UserViewController;
 import main.model.Course;
@@ -71,6 +73,7 @@ public class CourseDashboard extends JPanel {
 
         removeStudentBtn = new JButton("Remove Student");
         removeStudentBtn.setVisible(false);  // only show on Classlist view
+       
 
         
         JPanel rightPanel = new JPanel();
@@ -88,6 +91,120 @@ public class CourseDashboard extends JPanel {
         contentPanel.add(rightPanel, BorderLayout.EAST);
 
         mainViewPanel.add(contentPanel, BorderLayout.CENTER);
+        
+        JButton groupBtn = new JButton("Make Groups");
+        groupBtn.addActionListener(e -> {
+          String input = JOptionPane.showInputDialog(this, "Max students per group?", "Make Student Groups", JOptionPane.QUESTION_MESSAGE);
+          if (input == null) return;
+          int size;
+          try { size = Integer.parseInt(input); }
+          catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Enter a positive integer.", "Invalid", JOptionPane.ERROR_MESSAGE);
+            return;
+          }
+          List<StudentList> groups = controller.getSelectedCourse()
+                                              .getStudents()
+                                              .partition(size);
+          StringBuilder out = new StringBuilder();
+          for (int i = 0; i < groups.size(); i++) {
+            out.append("Group ").append(i+1).append(":\n");
+            for (Student s : groups.get(i)) {
+              out.append(" • ").append(s.getFullName())
+                 .append(" (").append(s.getUsername()).append(")\n");
+            }
+            out.append("\n");
+          }
+          JTextArea ta = new JTextArea(out.toString());
+          ta.setFont(UIManager.getFont("Label.font"));
+          ta.setEditable(false);
+          JScrollPane scroll = new JScrollPane(ta);
+          scroll.setPreferredSize(new Dimension(400,300));
+          JOptionPane.showMessageDialog(this, scroll, "Student Groups", JOptionPane.PLAIN_MESSAGE);
+          
+          
+        });
+        rightPanel.add(groupBtn);
+        
+        groupBtn.setVisible(false);
+        
+        
+        JButton manageCatsBtn = new JButton("Manage Categories");
+        manageCatsBtn.addActionListener(e -> {
+            Course c = controller.getSelectedCourse();
+            Map<String,Category> cats = c.getCategories();
+
+            JPanel form = new JPanel(new GridBagLayout());
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.insets = new Insets(4,4,4,4);
+            gbc.gridy = 0;
+
+            List<JTextField> weightFields = new ArrayList<>();
+            List<JTextField> dropFields   = new ArrayList<>();
+            List<String>      names        = new ArrayList<>();
+
+            // column headers
+            gbc.gridx = 0; form.add(new JLabel("Category"),       gbc);
+            gbc.gridx = 1; form.add(new JLabel("Weight (pts)"),   gbc);
+            gbc.gridx = 2; form.add(new JLabel("Drop Lowest"),    gbc);
+            gbc.gridy++;
+
+            // one row per existing category
+            for (String name : cats.keySet()) {
+              Category cat = cats.get(name);
+              gbc.gridx = 0; form.add(new JLabel(name),        gbc);
+              gbc.gridx = 1; 
+              JTextField w = new JTextField(""+cat.getPoints(), 5);
+              form.add(w, gbc);
+              gbc.gridx = 2; 
+              JTextField d = new JTextField(""+cat.getDropLowest(), 3);
+              form.add(d, gbc);
+
+              names.add(name);
+              weightFields.add(w);
+              dropFields.add(d);
+              gbc.gridy++;
+            }
+
+            // “New category” row
+            gbc.gridx = 0;
+            JTextField newName   = new JTextField(10);
+            form.add(newName,    gbc);
+            gbc.gridx = 1;
+            JTextField newWeight = new JTextField("100", 5);
+            form.add(newWeight,  gbc);
+            gbc.gridx = 2;
+            JTextField newDrop   = new JTextField("0", 3);
+            form.add(newDrop,    gbc);
+            gbc.gridy++;
+
+            int result = JOptionPane.showConfirmDialog(
+              this, form, "Manage Categories",
+              JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE
+            );
+            if (result == JOptionPane.OK_OPTION) {
+              // 1) update existing cats
+              for (int i = 0; i < names.size(); i++) {
+                String nm = names.get(i);
+                int pts = Integer.parseInt(weightFields.get(i).getText());
+                int dr  = Integer.parseInt(dropFields.get(i).getText());
+                c.setCategoryWeight(nm, pts);
+                c.setCategoryDropLowest(nm, dr);
+              }
+              // 2) maybe add a new one
+              String nn = newName.getText().trim();
+              if (!nn.isEmpty()) {
+                int pts = Integer.parseInt(newWeight.getText());
+                int dr  = Integer.parseInt(newDrop.getText());
+                c.addCategory(nn, pts, dr);       // don’t forget to add this helper!
+              }
+              // 3) refresh UI
+              updateAssignmentDisplay();
+            }
+        });
+        rightPanel.add(manageCatsBtn);
+
+        
+
 
         // === TOP SECTION ===
         JPanel upperInfo = new JPanel(new BorderLayout());
@@ -204,6 +321,7 @@ public class CourseDashboard extends JPanel {
             gradeStudentBtn.setVisible(true);
             setFinalGradesBtn.setVisible(true);
             addStudentBtn.setVisible(false);
+            groupBtn.setVisible(false);    // hide here
 
             Course selectedCourse = controller.getSelectedCourse();
             StudentList classlist = selectedCourse.getStudents();
@@ -213,6 +331,7 @@ public class CourseDashboard extends JPanel {
             classStatsLabel.setText(String.format("Class Average: %.2f%%   Median: %.2f%%", avg, median));
             classStatsLabel.setVisible(true);  
             removeStudentBtn.setVisible(false);
+            
 
         });
         
@@ -221,7 +340,10 @@ public class CourseDashboard extends JPanel {
          * === NOW THIS JUST CALLS OUR HELPER WHICH HAS IDENTICAL 
          * LOGIC TO PREVIOUS IMPLEMENTATION ===
         */
-        addClasslistBtn.addActionListener(e -> showClasslistView());
+        addClasslistBtn.addActionListener(e -> {
+            showClasslistView();           // your helper
+            groupBtn.setVisible(true);     // show here
+        });
 
         addAssignmentBtn.addActionListener(e -> {
             updateAssignmentDisplay();
@@ -235,6 +357,8 @@ public class CourseDashboard extends JPanel {
             addStudentBtn.setVisible(false);
             classStatsLabel.setVisible(false);  
             removeStudentBtn.setVisible(false);
+            groupBtn.setVisible(false);    // hide here
+           
         });
 
         removeStudentBtn.addActionListener(e -> {
@@ -361,6 +485,7 @@ public class CourseDashboard extends JPanel {
                     JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
                 }
             }
+           
         });
         
         setFinalGradesBtn.addActionListener(e -> {
@@ -430,6 +555,8 @@ public class CourseDashboard extends JPanel {
                 );
             }
         });
+        
+
     }
 
     private void updateAssignmentDisplay() {
