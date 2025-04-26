@@ -9,17 +9,16 @@ public abstract class User {
     protected String username;
     protected String password;
     protected String email;
+    protected String firstName;
+    protected String lastName;
 
-    public User(String username, String password, String email, boolean isHashed) {
+    public User(String username, String password, String firstName, String lastName, String email, boolean isHashed) {
         this.username = username;
         if(isHashed) this.password = password;
         else this.password = hashPassword(password);
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
-    }
-
-
-    public String getUsername() {
-        return username;
     }
 
     public static final byte[] salt = new byte[] { 
@@ -28,18 +27,6 @@ public abstract class User {
         (byte)0x9C, (byte)0xAD, (byte)0xBE, (byte)0xCF, 
         (byte)0xD0, (byte)0xE1, (byte)0xF2, (byte)0xFF 
     };
-    
-
-    public User(String username, String password, boolean isHashed) {
-        this.username = username;
-        if(isHashed) {
-            this.password = password;
-        } else {
-            this.password = hashPassword(password);
-        }
-    }
-
-    
 
     // Public static method in order to use in other classes to validate log in.
     public static String hashPassword(String password) {
@@ -55,9 +42,32 @@ public abstract class User {
         return Base64.getEncoder().encodeToString(hashedPassword);
     }
 
+    public String getUsername() {
+        return username;
+    }
+
     public String getHashedPassword() {
         return password;
     }
+
+    public String getFirstName() {
+        return firstName;
+    }
     
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
+
+    
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+    
+    public abstract ArrayList<Course> getCourses();
+
     public abstract ArrayList<Course> getCoursesForDay(Days day);
 }

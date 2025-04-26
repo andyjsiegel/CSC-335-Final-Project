@@ -10,16 +10,15 @@ import main.model.User;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.*;
 import java.util.HashSet;
 import java.util.Set;
 
 
 public class CalendarView extends JFrame {
 
-	User saveUser;
+
     public CalendarView(User user) {
-    	saveUser = user;
+
         // Set the title and size of the window
         setTitle("Calendar View");
         setSize(1000, 600);
@@ -77,13 +76,18 @@ public class CalendarView extends JFrame {
             // track displayed courses and avoid duplicates
             Set<String> displayedCourses = new HashSet<>();
             
+            //System.out.println("Checking "  + " | Days=" + day + user.getCoursesForDay(day));
+            
             for (Course course : user.getCoursesForDay(day)) {
+                boolean isInstructor = user instanceof Instructor;
+            	//System.out.println("Checking " + day + ": " + course.getName() + " | Days=" + course.getDays());
+
                 // Only add if we haven't displayed this course yet
                 if (!displayedCourses.contains(course.getCourseCode())) {
                     JButton classLabel = new JButton(course.getName());
                     classLabel.setText("<html><center>"+course.getName()+"<br>("+course.getCourseCode()+")</center></html>");
                     classLabel.addActionListener(e -> {
-                    	 JOptionPane.showMessageDialog(null, course.getCourseView(), course.getCode(), JOptionPane.PLAIN_MESSAGE);
+                    	 JOptionPane.showMessageDialog(null, course.getCourseView(user), course.getCourseCode(), JOptionPane.PLAIN_MESSAGE);
                     });
                     
                     dayPanel.add(classLabel);
@@ -98,5 +102,3 @@ public class CalendarView extends JFrame {
         setVisible(true);
     }
 }
-
-

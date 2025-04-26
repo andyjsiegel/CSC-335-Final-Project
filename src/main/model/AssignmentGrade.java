@@ -1,7 +1,5 @@
 package main.model;
 
-import java.util.Date;
-
 public class AssignmentGrade {
     private Assignment assignment;
     private double pointsEarned;
