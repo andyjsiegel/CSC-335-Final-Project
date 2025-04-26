@@ -1,184 +1,105 @@
 package main.tests;
 
+import main.model.*;
 import org.junit.jupiter.api.*;
 
-import main.model.*;
-
-import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
-// StudentGradebookTest
 class StudentGradebookTest {
-    StudentGradebook gb;
-    Assignment a1, a2;
+    private StudentGradebook gb;
+    private Course course;
 
     @BeforeEach
     void setup() {
-        gb = new StudentGradebook("Course");
-        a1 = new Assignment("A1","D1",10);
-        a2 = new Assignment("A2","D2",20);
-        gb.addAssignment(a1, 8.0);
-        gb.addAssignment(a2, 16.0);
+        // Create a dummy course for the gradebook
+        course = new Course(
+            "TestCourse", "TC101", "A test course",
+            new Instructor("i","p","I","N","e@mail", false),
+            new ArrayList<>()
+        );
+        gb = new StudentGradebook(course);
     }
 
     @Test
-    void testCalculateAverageAndFinal() {
-        gb.calculateAverage();
-        // just ensure no exception
-        gb.getFinalGrade();
+    void testCalculateAverageAndFinalGrade() {
+        // Add two graded assignments: 8/10 and 16/20
+        gb.addAssignment(new Assignment("A1","D1", 10), 8.0);
+        gb.addAssignment(new Assignment("A2","D2", 20), 16.0);
+        // (8 + 16) / (10 + 20) * 100 = 80.0
+        double avg = gb.calculateAverage();
+        assertEquals(80.0, avg, 1e-9);
+
+        // calculateFinalGrade() currently delegates to calculateAverage()
+        double finalPct = gb.calculateFinalGrade();
+        assertEquals(avg, finalPct, 1e-9);
     }
 
     @Test
-    void testCalculateMedian() {
-        gb.calculateMedian();
-        // no exception
+    void testCalculateWeightedAverageSingleCategory() {
+        // Set up exactly one category so weighted==simple
+        course.addCategory("Default", 100, 0);
+        Assignment a = new Assignment("A","D", 10);
+        a.setCategory("Default");
+        gb.addAssignment(a, 5.0);  // 5/10 → 0.5
+
+        // Weighted average = 0.5 * 100 = 50.0
+        double wavg = gb.calculateWeightedAverage();
+        assertEquals(50.0, wavg, 1e-9);
     }
-    
+
     @Test
-    void testCalculateAverageAndFinalGrade() throws Exception {
-        StudentGradebook sg = new StudentGradebook("TestCourse");
-        Assignment a1 = new Assignment("A1", "desc", 10);
-        Assignment a2 = new Assignment("A2", "desc", 20);
+    void testCalculateMedianOddAndEven() {
+        // Odd count: [2,5,8] → median=5
+        gb.addAssignment(new Assignment("X1","d",10), 2.0);
+        gb.addAssignment(new Assignment("X2","d",10), 5.0);
+        gb.addAssignment(new Assignment("X3","d",10), 8.0);
+        assertEquals(5.0, gb.calculateMedian(), 1e-9);
 
-        sg.addAssignment(a1, 8);
-        sg.addAssignment(a2, 16);
-        sg.calculateAverage();
-
-        // Reflectively read the private field classAverage
-        Field avgField = StudentGradebook.class.getDeclaredField("classAverage");
-        avgField.setAccessible(true);
-        double avg = (double) avgField.get(sg);
-
-        assertEquals(125.0, avg, 1e-6,
-            "Expected classAverage = (30 / 24) * 100 ≈ 125.0");
-
-        // Now set and verify the finalGrade
-        sg.getFinalGrade();
-        Field fgField = StudentGradebook.class.getDeclaredField("finalGrade");
-        fgField.setAccessible(true);
-        FinalGrades fg = (FinalGrades) fgField.get(sg);
-
-        assertEquals(FinalGrades.A, fg,
-            "With average ≥ 90, finalGrade should be A");
+        // Even count: [2,5,8,10] → median=(5+8)/2=6.5
+        gb = new StudentGradebook(course);
+        gb.addAssignment(new Assignment("Y1","d",10), 2.0);
+        gb.addAssignment(new Assignment("Y2","d",10), 5.0);
+        gb.addAssignment(new Assignment("Y3","d",10), 8.0);
+        gb.addAssignment(new Assignment("Y4","d",10),10.0);
+        assertEquals(6.5, gb.calculateMedian(), 1e-9);
     }
 
-    /**
-     * Test calculateMedian() on an odd number of grades.
-     * Grades: [8, 14, 24] → median = 14
-     */
-    @Test
-    void testCalculateMedianOdd() throws Exception {
-        StudentGradebook sg = new StudentGradebook("Course");
-        sg.addAssignment(new Assignment("A1","d", 10), 8);
-        sg.addAssignment(new Assignment("A2","d", 20), 14);
-        sg.addAssignment(new Assignment("A3","d", 30), 24);
-
-        sg.calculateMedian();
-
-        Field medianField = StudentGradebook.class.getDeclaredField("median");
-        medianField.setAccessible(true);
-        double median = (double) medianField.get(sg);
-
-        assertEquals(14.0, median, 1e-6,
-            "Median of [8,14,24] should be 14");
-    }
-
-    /**
-     * Test calculateMedian() on an even number of grades.
-     * Grades: [8, 10, 14, 24] → median = (10 + 14) / 2 = 12
-     */
-    @Test
-    void testCalculateMedianEven() throws Exception {
-        StudentGradebook sg = new StudentGradebook("Course");
-        sg.addAssignment(new Assignment("A1","d", 10), 8);
-        sg.addAssignment(new Assignment("A2","d", 20), 14);
-        sg.addAssignment(new Assignment("A3","d", 30), 24);
-        sg.addAssignment(new Assignment("A4","d", 40), 10);
-
-        sg.calculateMedian();
-
-        Field medianField = StudentGradebook.class.getDeclaredField("median");
-        medianField.setAccessible(true);
-        double median = (double) medianField.get(sg);
-
-        assertEquals(12.0, median, 1e-6,
-            "Median of [8,10,14,24] should be (10+14)/2 = 12");
-    }
-    
-    /**
-     * Ensures getAssignments() returns a new List each time,
-     * so that mutating the returned list does not affect the
-     * gradebook’s internal assignments.
-     */
     @Test
     void testGetAssignmentsReturnsCopy() {
-        StudentGradebook sg = new StudentGradebook("DemoCourse");
-        Assignment a1 = new Assignment("HW1", "desc", 10);
-        Assignment a2 = new Assignment("HW2", "desc", 20);
+        Assignment a1 = new Assignment("A1","D1",10);
+        Assignment a2 = new Assignment("A2","D2",20);
+        gb.addAssignment(a1, 5.0);
+        gb.addAssignment(a2,10.0);
 
-        // add two assignments
-        sg.addAssignment(a1, 8);
-        sg.addAssignment(a2, 16);
-
-        // first snapshot
-        java.util.List<Assignment> first = sg.getAssignments();
-        assertEquals(2, first.size(), "Should have 2 assignments initially");
-
-        // mutate the returned list
+        List<Assignment> first = gb.getAssignments();
+        assertEquals(2, first.size());
+        // Mutate the returned list
         first.remove(0);
-
-        // second snapshot from fresh call
-        java.util.List<Assignment> second = sg.getAssignments();
-        assertEquals(2, second.size(),
-            "Removing from the first snapshot must not affect the gradebook’s internal list");
+        // Underlying list should be unaffected
+        List<Assignment> second = gb.getAssignments();
+        assertEquals(2, second.size());
     }
 
     @Test
-    void testSetFinalGrade() throws Exception {
-        StudentGradebook sg = new StudentGradebook("DummyCourse") {
-            @Override
-            public double calculateAverage() {
-                // do nothing,
-                return 0.0; 
-            }
-        };
+    void testGetAndSetFinalGrade() {
+        // Initially null
+        assertNull(gb.getFinalGrade());
+        gb.setFinalGrade(FinalGrades.C);
+        assertEquals(FinalGrades.C, gb.getFinalGrade());
+    }
 
-        Field avgField = StudentGradebook.class.getDeclaredField("classAverage");
-        avgField.setAccessible(true);
-        Field fgField  = StudentGradebook.class.getDeclaredField("finalGrade");
-        fgField .setAccessible(true);
+    @Test
+    void testEqualsAndHashCode() {
+        // Two fresh gradebooks on the same course with zero points should be equal
+        StudentGradebook other = new StudentGradebook(course);
+        assertEquals(gb, other);
+        assertEquals(gb.hashCode(), other.hashCode());
 
-        double[] grades = {95.0, 90.0, 89.9, 85.0, 80.0, 79.9, 72.0, 70.0, 
-                           69.9, 61.0, 60.0, 59.9, 55.0, 50.0, 49.9, 30.0};
-        FinalGrades[] expects = {
-        	    //  95.0, 90.0
-        	    FinalGrades.A, FinalGrades.A,
-        	    //  89.9, 85.0, 80.0
-        	    FinalGrades.B, FinalGrades.B, FinalGrades.B,
-        	    //  79.9, 72.0, 70.0
-        	    FinalGrades.C, FinalGrades.C, FinalGrades.C,
-        	    //  69.9, 61.0, 60.0
-        	    FinalGrades.D, FinalGrades.D, FinalGrades.D,
-        	    //  59.9, 55.0, 50.0   <-- three E’s here
-        	    FinalGrades.E, FinalGrades.E, FinalGrades.E,
-        	    //  49.9, 30.0
-        	    FinalGrades.E, FinalGrades.E
-        	};
-
-
-        for (int i = 0; i < grades.length; i++) {
-            final double injectedAverage = grades[i];
-            final FinalGrades expectedGrade = expects[i];
-
-            avgField.setDouble(sg, injectedAverage);
-            sg.getFinalGrade();
-
-            FinalGrades actual = (FinalGrades) fgField.get(sg);
-            assertEquals(expectedGrade, actual,
-                () -> String.format("With classAverage=%.1f expected %s but got %s",
-                                    injectedAverage, expectedGrade, actual));
-        }
+        // After adding points to one, they differ
+        gb.addAssignment(new Assignment("Z","d",10), 3.0);
+        assertNotEquals(gb, other);
     }
 }
