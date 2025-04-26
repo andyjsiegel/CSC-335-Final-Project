@@ -2,6 +2,7 @@ package main.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
@@ -137,8 +138,11 @@ public class Course {
             }
     
             Assignment assignment = new Assignment(title, description, maxPoints);
+            assignment.setCategory(category);
             categories.get(category).addAssignment(assignment);
             this.addAssignment(assignment);
+            
+            
     
             // Add the assignment to all students
             for (Student student : studentList) {
@@ -268,6 +272,7 @@ public class Course {
             String category = categoryField.getSelectedItem().toString();
             int maxPoints = Integer.parseInt(maxPointsField.getText());
             Assignment assignment = new Assignment(title, description, maxPoints);
+            assignment.setCategory(category);
             categories.get(category).addAssignment(assignment);
             this.addAssignment(assignment);
             titleField.setText("");
@@ -403,6 +408,21 @@ public class Course {
 	// getters / setters:
 	public CalculationMode getCalculationMode() { return calculationMode; }
 	public void setCalculationMode(CalculationMode m) { this.calculationMode = m; }
-
+	
+	
+	public GradingScheme getGradingScheme() {
+	    // 1) total up all category‐points
+	    double totalPoints = categories.values().stream()
+	                                   .mapToDouble(Category::getPoints)
+	                                   .sum();
+	    // 2) build the two maps
+	    Map<String,Double> weightMap = new HashMap<>();
+	    Map<String,Integer> dropMap   = new HashMap<>();
+	    for (Category cat : categories.values()) {
+	        weightMap.put(cat.getName(), cat.getPoints() / totalPoints);
+	        dropMap  .put(cat.getName(), cat.getDropLowest());
+	    }
+	    return new GradingScheme(weightMap, dropMap);
+	}
     
 }

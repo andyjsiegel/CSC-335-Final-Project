@@ -63,9 +63,11 @@ public class Category {
     }
 
     public void addAssignment(Assignment assignment) {
+        // tag the assignment with its category name
+        assignment.setCategory(this.name);
         this.assignments.add(assignment);
     }
-    
+
     public int getDropLowest() { 
     	return dropLowest; 
    	}

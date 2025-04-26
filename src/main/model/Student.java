@@ -36,7 +36,7 @@ public class Student extends User {
 	public void addCourse(Course course) {
 		System.out.println("Added course " + course.getName() + " to student " + this.firstName + " " + this.lastName);
 		coursesTaken.add(course);
-		gradebooks.add(new StudentGradebook(course.getName()));
+		gradebooks.add(new StudentGradebook(course));  // pass the Course
 	}
 
 

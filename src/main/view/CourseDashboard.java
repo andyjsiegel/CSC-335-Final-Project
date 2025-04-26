@@ -501,34 +501,16 @@ public class CourseDashboard extends JPanel {
             StringBuilder resultMessage = new StringBuilder("Final grades assigned:\n\n");
             
             for (Student student : students) {
-                StudentGradebook gradebook = student.getGradebookForCourse(course1);
-                if (gradebook == null) continue;
-                
-                double totalEarned = 0;
-                double totalPossible = 0;
-                
-                for (Assignment assignment : gradebook.getAssignments()) {
-                    totalEarned += assignment.getPointsEarned();
-                    totalPossible += assignment.getMaxPoints();
-                }
-                
-                if (totalPossible > 0) {
-                    double percentage = (totalEarned / totalPossible) * 100;
-                    FinalGrades grade = calculateFinalGrade(percentage);
-                    gradebook.setFinalGrade(grade);
-                    count++;
-                    
-                    resultMessage.append(student.getFullName())
-                        .append(": ")
-                        .append(String.format("%.2f", percentage))
-                        .append("% - ")
-                        .append(grade)
-                        .append("\n");
-                } else {
-                    resultMessage.append(student.getFullName())
-                        .append(": No assignments to grade\n");
-                }
+                StudentGradebook gb = student.getGradebookForCourse(course);
+                double pct = gb.calculateFinalGrade();         // 0–100, already picks weighted vs. points‐sum
+                FinalGrades letter = calculateFinalGrade(pct); // your existing helper
+
+                gb.setFinalGrade(letter);
+                resultMessage.append(student.getFullName())
+                             .append(": ")
+                             .append(String.format("%.2f%% - %s\n", pct, letter));
             }
+
             
             // Update the display
             infoArea.setText(getGradesInfo());
@@ -619,7 +601,7 @@ public class CourseDashboard extends JPanel {
                 totalPossible += a.getMaxPoints();
             }
 
-            double percentage = (totalPossible > 0) ? (100 * totalEarned / totalPossible) : 0;
+            double percentage = gb.calculateFinalGrade();
             sb.append("  Total: ").append(String.format("%.2f", totalEarned)).append("/")
               .append(String.format("%.2f", totalPossible))
               .append(" (").append(String.format("%.2f", percentage)).append("%)\n");
