@@ -84,4 +84,9 @@ The project separates areas into different packages:
 The project includes JUnit 5 tests in the `main.tests` package.
 
 * **Running Tests (IDE):** Most IDEs allow you to right-click on the `main.tests` package or individual test files/methods and select "Run Tests".
-* **Running Tests (Build Tools):** If using a build tool like Maven or Gradle (not explicitly shown in provided code), use the standard test commands (e.g., `mvn test`, `gradle test`).
+* **Running Tests (Build Tools):** If using a build tool like Maven or Gradle (not explicitly shown in provided code), use the standard test commands (e.g., `mvn test`, `gradle test`).*
+
+![Class Diagram](temp)
+![Class Diagram](temp)
+![Class Diagram](temp)
+![Class Diagram](temp)
