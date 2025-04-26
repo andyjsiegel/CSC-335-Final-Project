@@ -15,6 +15,7 @@ import java.util.Map;
 import main.controller.UserViewController;
 import main.model.Course;
 import main.model.FinalGrades;
+import main.model.Instructor;
 import main.model.Student;
 import main.model.StudentGradebook;
 import main.model.StudentList;
@@ -127,6 +128,8 @@ public class CourseDashboard extends JPanel {
         
         groupBtn.setVisible(false);
         
+
+
         
         JButton manageCatsBtn = new JButton("Manage Categories");
         manageCatsBtn.addActionListener(e -> {
@@ -195,7 +198,7 @@ public class CourseDashboard extends JPanel {
               if (!nn.isEmpty()) {
                 int pts = Integer.parseInt(newWeight.getText());
                 int dr  = Integer.parseInt(newDrop.getText());
-                c.addCategory(nn, pts, dr);       // don’t forget to add this helper!
+                c.addCategory(nn, pts, dr);       
               }
               // 3) refresh UI
               updateAssignmentDisplay();
@@ -203,7 +206,18 @@ public class CourseDashboard extends JPanel {
         });
         rightPanel.add(manageCatsBtn);
 
-        
+        if (!(controller.getUser() instanceof Instructor)) {
+        	System.out.println("erm");
+            sideAddAssignmentBtn.setVisible(false);
+            manageCatsBtn.setVisible(false);
+            addStudentBtn.setVisible(false);
+            removeStudentBtn.setVisible(false);
+            groupBtn.setVisible(false);
+            gradeStudentBtn.setVisible(false);
+            setFinalGradesBtn.setVisible(false);
+        } else {
+        	System.out.println("erm 2");
+        }
 
 
         // === TOP SECTION ===
@@ -244,7 +258,7 @@ public class CourseDashboard extends JPanel {
         pfpLabel.setAlignmentY(0.5f);
 
         // Text overlay on the picture
-        JLabel overlayText = new JLabel("" + course.getInstructor().getFirstName().charAt(0) + "" + course.getInstructor().getLastName().charAt(0));
+        JLabel overlayText = new JLabel("" + controller.getUser().getFirstName().charAt(0) + "" + controller.getUser().getLastName().charAt(0));
         overlayText.setFont(new Font("SansSerif", Font.BOLD, 12));
         overlayText.setForeground(Color.WHITE);
         overlayText.setHorizontalAlignment(SwingConstants.CENTER);
@@ -260,7 +274,7 @@ public class CourseDashboard extends JPanel {
         overlayPanel.add(pfpLabel);      
 
         // === USERNAME LABEL ===
-        JLabel userNameLabel = new JLabel(course.getInstructor().getFullName());
+        JLabel userNameLabel = new JLabel(controller.getUser().getFullName());
         userNameLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
         userNameLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0)); // space from image
 
@@ -318,8 +332,13 @@ public class CourseDashboard extends JPanel {
             infoArea.setText(getGradesInfo());
 
             sideAddAssignmentBtn.setVisible(false);
-            gradeStudentBtn.setVisible(true);
-            setFinalGradesBtn.setVisible(true);
+            
+            if (controller.getUser() instanceof Instructor) {
+                gradeStudentBtn.setVisible(true);
+                setFinalGradesBtn.setVisible(true);
+                classStatsLabel.setVisible(true);  
+            }
+
             addStudentBtn.setVisible(false);
             groupBtn.setVisible(false);    // hide here
 
@@ -329,7 +348,6 @@ public class CourseDashboard extends JPanel {
             double median = classlist.getClassMedian(selectedCourse);
 
             classStatsLabel.setText(String.format("Class Average: %.2f%%   Median: %.2f%%", avg, median));
-            classStatsLabel.setVisible(true);  
             removeStudentBtn.setVisible(false);
             
 
@@ -341,13 +359,26 @@ public class CourseDashboard extends JPanel {
          * LOGIC TO PREVIOUS IMPLEMENTATION ===
         */
         addClasslistBtn.addActionListener(e -> {
-            showClasslistView();           // your helper
-            groupBtn.setVisible(true);     // show here
+        	showClasslistView();           // your helper
+            if (controller.getUser() instanceof Instructor) {
+            	groupBtn.setVisible(true);     // show here
+            } else {
+                sideAddAssignmentBtn.setVisible(false);
+                gradeStudentBtn.setVisible(false);
+                setFinalGradesBtn.setVisible(false);
+                addStudentBtn.setVisible(false);
+                removeStudentBtn.setVisible(false);
+                classStatsLabel.setVisible(false);
+            }
+            
         });
 
         addAssignmentBtn.addActionListener(e -> {
+       
             updateAssignmentDisplay();
+            if (controller.getUser() instanceof Instructor) {
             sideAddAssignmentBtn.setVisible(true);
+            }
 
             JPanel assignmentPanel = controller.getSelectedCourse().getAssignmentAddPanel();
             
@@ -357,8 +388,9 @@ public class CourseDashboard extends JPanel {
             addStudentBtn.setVisible(false);
             classStatsLabel.setVisible(false);  
             removeStudentBtn.setVisible(false);
-            groupBtn.setVisible(false);    // hide here
+            groupBtn.setVisible(false);    
            
+  
         });
 
         removeStudentBtn.addActionListener(e -> {
@@ -581,46 +613,98 @@ public class CourseDashboard extends JPanel {
         StringBuilder sb = new StringBuilder();
         sb.append("Grades for ").append(course.getName()).append(":\n\n");
 
-        for (Student student : classlist) {
-            sb.append(student.getFirstName()).append(" ").append(student.getLastName()).append(":\n");
+        if (controller.getUser() instanceof Instructor) {
+            // Show everyone's grades
+            for (Student student : classlist) {
+                sb.append(student.getFirstName()).append(" ").append(student.getLastName()).append(":\n");
 
-            StudentGradebook gb = student.getGradebookForCourse(course);
+                StudentGradebook gb = student.getGradebookForCourse(course);
+                if (gb == null || gb.getAssignments().isEmpty()) {
+                    sb.append("  No grades available.\n\n");
+                    continue;
+                }
+
+                double totalEarned = 0;
+                double totalPossible = 0;
+
+                for (Assignment a : gb.getAssignments()) {
+                    sb.append("  ").append(a.getTitle())
+                      .append(" - ").append(a.getPointsEarned())
+                      .append("/").append(a.getMaxPoints()).append("\n");
+                    totalEarned += a.getPointsEarned();
+                    totalPossible += a.getMaxPoints();
+                }
+
+                double percentage = gb.calculateFinalGrade();
+                sb.append("  Total: ").append(String.format("%.2f", totalEarned)).append("/")
+                  .append(String.format("%.2f", totalPossible))
+                  .append(" (").append(String.format("%.2f", percentage)).append("%)\n");
+
+                if (gb.getFinalGrade() != null) {
+                    sb.append("  Final Grade: ").append(gb.getFinalGrade()).append("\n");
+                }
+
+                sb.append("\n");
+            }
+        } else {
+            // Show only THIS student's grades
+            Student currentStudent = (Student) controller.getUser();
+            sb.append(currentStudent.getFirstName()).append(" ").append(currentStudent.getLastName()).append(":\n");
+
+            StudentGradebook gb = currentStudent.getGradebookForCourse(course);
             if (gb == null || gb.getAssignments().isEmpty()) {
-                sb.append("  No grades available.\n\n");
-                continue;
-            }
+                sb.append("  No grades available.\n");
+            } else {
+                double totalEarned = 0;
+                double totalPossible = 0;
 
-            double totalEarned = 0;
-            double totalPossible = 0;
+                for (Assignment a : gb.getAssignments()) {
+                    sb.append("  ").append(a.getTitle())
+                      .append(" - ").append(a.getPointsEarned())
+                      .append("/").append(a.getMaxPoints()).append("\n");
+                    totalEarned += a.getPointsEarned();
+                    totalPossible += a.getMaxPoints();
+                }
 
-            for (Assignment a : gb.getAssignments()) {
-                sb.append("  ").append(a.getTitle())
-                  .append(" - ").append(a.getPointsEarned())
-                  .append("/").append(a.getMaxPoints()).append("\n");
-                totalEarned += a.getPointsEarned();
-                totalPossible += a.getMaxPoints();
-            }
+                double percentage = gb.calculateFinalGrade();
+                sb.append("  Total: ").append(String.format("%.2f", totalEarned)).append("/")
+                  .append(String.format("%.2f", totalPossible))
+                  .append(" (").append(String.format("%.2f", percentage)).append("%)\n");
 
-            double percentage = gb.calculateFinalGrade();
-            sb.append("  Total: ").append(String.format("%.2f", totalEarned)).append("/")
-              .append(String.format("%.2f", totalPossible))
-              .append(" (").append(String.format("%.2f", percentage)).append("%)\n");
-              
-            // Add final grade if it exists
-            if (gb.getFinalGrade() != null) {
-                sb.append("  Final Grade: ").append(gb.getFinalGrade()).append("\n");
+                if (gb.getFinalGrade() != null) {
+                    sb.append("  Final Grade: ").append(gb.getFinalGrade()).append("\n");
+                }
             }
-            
-            sb.append("\n");
         }
 
         return sb.toString();
     }
-    
+
     /**
      * == CENTRALIZED TO SIMPLIFY BACK BUTTON LOGIC AND NOT REBUILD THE VIEW BUT JUST CALL THIS ==
      * Centralized routine to show the Classlist view with sorting dropdown.
      */
+    
+    private void studentShowClassListView() {
+        // 1) Populate the infoArea with the unsorted classlist
+        updateSortedClasslist(0);
+
+        // 2) Adjust button visibility
+        sideAddAssignmentBtn.setVisible(false);
+        gradeStudentBtn.setVisible(false);
+        setFinalGradesBtn.setVisible(false);
+        addStudentBtn.setVisible(false);
+        removeStudentBtn.setVisible(false);
+        classStatsLabel.setVisible(false);
+        
+        // 3) Remove any old JComboBox
+        for (Component comp : contentPanel.getComponents()) {
+            if (comp instanceof JComboBox) {
+                contentPanel.remove(comp);
+            }
+        }
+        
+    }
     private void showClasslistView() {
         // 1) Populate the infoArea with the unsorted classlist
         updateSortedClasslist(0);

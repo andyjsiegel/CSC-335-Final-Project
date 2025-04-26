@@ -41,14 +41,17 @@ public class StudentGradebook {
     /** 
      * Mode 1: simple points‐sum percentage (0–100). 
      */
-    public double calculateAverage() {
-        double totalPossible = courseAssignments.stream()
-            .mapToDouble(Assignment::getMaxPoints)
-            .sum();
-        if (totalPossible == 0) return 0.0;
-        return (points / totalPossible) * 100.0;
-    }
-    
+	public double calculateAverage() {
+		int maxPoints = 0;
+		
+		for (Assignment assignment : courseAssignments) {
+			maxPoints += assignment.getMaxPoints();
+		}
+		
+		calculatedGrade = (points / maxPoints) * 100;
+		return calculatedGrade;
+	}
+
     /** 
      * Mode 2: weighted average (0–100) using your GradingScheme's weights & drops. 
      */
@@ -76,7 +79,7 @@ public class StudentGradebook {
      */
     public double calculateFinalGrade() {
         if (course.getCalculationMode() == Course.CalculationMode.WEIGHTED) {
-            return calculateWeightedAverage();
+            return calculateAverage();
         } else {
             return calculateAverage();
         }
