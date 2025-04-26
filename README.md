@@ -52,16 +52,16 @@ The project separates areas into different packages:
 
 1.  **Prerequisites:**
     * Java Development Kit (JDK) 8 or higher.
-    * An IDE like Eclipse, IntelliJ IDEA, or VS Code (recommended) or command-line `javac` and `java`.
+    * An IDE like Eclipse, IntelliJ IDEA, or VS Code (recommended)
 2.  **Clone the Repository:**
     ```bash
     git clone https://github.com/andyjsiegel/CSC-335-Final-Project
     cd CSC-335-Final-Project
     ```
 3.  **Compile:**
-    * **Using an IDE:** Import the project and use the IDE's build functionality.
+    * Import the project and use the IDE's build functionality.
 4.  **Run:**
-    * **Using an IDE:** Run the `main.view.LoginScreen` class.
+    * Run the `main.view.LoginScreen` class.
 5.  **User Data File:** The application will attempt to create/use a `users.csv` file at `src/main/controller/users.csv` by default (see `UserDatabase`). Ensure the application has write permissions to this location or modify the path in `UserDatabase` if needed.
 
 ## Usage
@@ -70,7 +70,7 @@ The project separates areas into different packages:
 2.  **Register:** If you are a new user, click the "Register" button and fill in the required details (username, password, name, email, role).
 3.  **Login:** Enter your username and password and click "Login".
 4.  **Navigation:** After logging in, you will be presented with the `MainView` dashboard.
-    * Use the buttons at the bottom or the menu bar to navigate between different views (Add Class, List View, Calendar View).
+    * Use the buttons at the bottom or the menu bar to navigate between different views (Add Class [only available to instructors], List View, Calendar View).
 5.  **Instructors:**
     * Can use "Add Class" to create new courses.
     * Can view created courses in the List or Calendar view.
